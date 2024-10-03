@@ -1,6 +1,6 @@
 #include "raylib.h"
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
+// #define RAYGUI_IMPLEMENTATION
+// #include "raygui.h"
 
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>
@@ -8,8 +8,8 @@
 
 #include "Game.hpp"
 
-static const int screenWidth = 800;
-static const int screenHeight = 450;
+static const int screenWidth = 1600;
+static const int screenHeight = 1000;
 
 void UpdateDrawFrame(Game &game);
 

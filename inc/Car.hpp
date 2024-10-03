@@ -11,17 +11,23 @@ public:
 	void draw() const;
 	void update(float dt);
 
-	const Vector2 &getPosition() const;
-
 private:
 	Car() = delete;
+
+	void handleInput();
+	void accumulateForces();
+	void verletStep(float dt);
+	void satisfyConstraints();
 
 	Texture2D texture;
 
 	Vector2 position;
+	Vector2 previousPosition;
+	Vector2 netForce;
+
+	float throttle;
+	float steering;
 	float rotation;
-	float speed;
-	float acceleration;
-	float brakingAcceleration;
-	float idleAcceleration;
+
+	void drawDebugPanel(Vector2 panelPosition) const; // TODO: rm
 };

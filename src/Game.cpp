@@ -8,7 +8,7 @@ void Game::draw() const
 {
 	BeginDrawing();
 	ClearBackground(RAYWHITE);
-	DrawFPS(10, 10);
+	DrawFPS(GetScreenWidth() - 80, 10);
 	car.draw();
 	EndDrawing();
 }
