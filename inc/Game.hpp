@@ -1,9 +1,8 @@
 #pragma once
 
-#include "raylib.h"
+#include "Ball.hpp"
 
-#include "Track.hpp"
-#include "Car.hpp"
+#include "raylib.h"
 
 class Game
 {
@@ -11,10 +10,10 @@ public:
 	Game();
 	~Game();
 
-	void draw() const;
+	void draw();
 	void update(float dt);
 
 private:
-	Track track;
-	Car car;
+	static const int numBalls = 500;
+	Ball *balls[numBalls];
 };

@@ -29,8 +29,6 @@ Graphics utilities are provided by [raylib](https://www.raylib.com/index.html), 
 
 ## Build and Run
 
-<!-- TODO: test both build instructions -->
-
 Clone the repository
 
 ```bash
@@ -65,8 +63,8 @@ To build for the web:
 
 ```bash
 mkdir -p build/web
-emcmake cmake . -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXECUTABLE_SUFFIX=".html"
 cd build/web
+emcmake cmake ../.. -DPLATFORM=Web -DCMAKE_BUILD_TYPE=Release -DCMAKE_EXECUTABLE_SUFFIX=".html"
 emmake make
 ```
 

@@ -11,12 +11,13 @@
 static const int screenWidth = 1600;
 static const int screenHeight = 1000;
 
-void UpdateDrawFrame(Game &game);
+void UpdateDrawFrame();
+
+static Game game = Game();
 
 int main()
 {
 	InitWindow(screenWidth, screenHeight, "sidewinder");
-	Game game = Game();
 
 #if defined(PLATFORM_WEB)
 	emscripten_set_main_loop(UpdateDrawFrame, 0, 1);
@@ -25,14 +26,14 @@ int main()
 
 	while (!WindowShouldClose())
 	{
-		UpdateDrawFrame(game);
+		UpdateDrawFrame();
 	}
 #endif
 
 	CloseWindow();
 }
 
-void UpdateDrawFrame(Game &game)
+void UpdateDrawFrame()
 {
 	game.update(GetFrameTime());
 	game.draw();
