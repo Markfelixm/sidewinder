@@ -13,7 +13,7 @@ public:
 	Vector2 getAcceleration() const;
 	void setAcceleration(const Vector2 &netAcceleration);
 
-	void update(float dt);
+	void update(float deltaTime);
 	virtual void satisfyConstraints();
 
 	Vector2 determineVelocity() const;

@@ -25,14 +25,14 @@ void Particle::setAcceleration(const Vector2 &netAcceleration)
 {
 	acceleration = netAcceleration;
 }
-void Particle::update(float dt)
+void Particle::update(float deltaTime)
 {
 	Vector2 temp = position;
 
 	// Verlet Integration
 	// x(t + dt) = 2x(t) - x(t - dt) + a * dt * dt
 	Vector2 positionComponent = Vector2Subtract(Vector2Scale(position, 2), previousPosition);
-	Vector2 accelerationComponent = Vector2Scale(acceleration, dt * dt);
+	Vector2 accelerationComponent = Vector2Scale(acceleration, deltaTime * deltaTime);
 	position = Vector2Add(positionComponent, accelerationComponent);
 
 	previousPosition = temp;
