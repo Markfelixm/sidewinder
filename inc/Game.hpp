@@ -1,8 +1,8 @@
 #pragma once
 
-#include "Ball.hpp"
-
 #include "raylib.h"
+
+#include "Stick.hpp"
 
 class Game
 {
@@ -11,9 +11,18 @@ public:
 	~Game();
 
 	void draw();
-	void update(float dt);
+	void update(float deltaTime);
 
 private:
-	static const int numBalls = 500;
-	Ball *balls[numBalls];
+	Particle topLeft;
+	Particle bottomLeft;
+	Particle topRight;
+	Particle bottomRight;
+
+	Stick left;
+	Stick top;
+	Stick right;
+	Stick bottom;
+	Stick crossLeft;
+	Stick crossRight;
 };
