@@ -2,7 +2,7 @@
 
 #include "raylib.h"
 
-#include "Stick.hpp"
+#include "Spring.hpp"
 
 class Game
 {
@@ -14,15 +14,27 @@ public:
 	void update(float deltaTime);
 
 private:
-	Particle topLeft;
-	Particle bottomLeft;
-	Particle topRight;
-	Particle bottomRight;
+	void mouseDragBob();
+	void mouseDragBox();
 
-	Stick left;
-	Stick top;
-	Stick right;
-	Stick bottom;
-	Stick crossLeft;
-	Stick crossRight;
+	float gravity;
+	float particleRadius;
+
+	Particle anchor;
+	Particle bob;
+	Particle a;
+	Particle b;
+	Particle c;
+	Particle d;
+
+	float springStiffness;
+	float springDamping;
+
+	Spring anchoredSpring;
+	Spring springAB;
+	Spring springBC;
+	Spring springCD;
+	Spring springAD;
+	Spring springAC;
+	Spring springBD;
 };
