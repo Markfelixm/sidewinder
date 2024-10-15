@@ -2,7 +2,7 @@
 
 #include "raymath.h"
 
-Particle::Particle(const Vector2 &initialPosition) : position(initialPosition), previousPosition(initialPosition), acceleration({0.f, 0.f}) {}
+Particle::Particle(const Vector2 &initialPosition) : position(initialPosition), previousPosition(initialPosition), netAcceleration({0.f, 0.f}) {}
 
 Particle::~Particle() {}
 
@@ -11,20 +11,26 @@ Vector2 Particle::getPosition() const
 	return position;
 }
 
-void Particle::setPosition(const Vector2 &netPosition)
+void Particle::setPosition(const Vector2 &newPosition)
 {
-	position = netPosition;
+	position = newPosition;
 }
 
 Vector2 Particle::getAcceleration() const
 {
-	return acceleration;
+	return netAcceleration;
 }
 
-void Particle::setAcceleration(const Vector2 &netAcceleration)
+void Particle::setAcceleration(const Vector2 &acceleration)
 {
-	acceleration = netAcceleration;
+	netAcceleration = acceleration;
 }
+
+void Particle::applyAcceleration(const Vector2 &acceleration)
+{
+	netAcceleration = Vector2Add(netAcceleration, acceleration);
+}
+
 void Particle::update(float deltaTime)
 {
 	Vector2 temp = position;
@@ -32,7 +38,7 @@ void Particle::update(float deltaTime)
 	// Verlet Integration
 	// x(t + dt) = 2x(t) - x(t - dt) + a * dt * dt
 	Vector2 positionComponent = Vector2Subtract(Vector2Scale(position, 2), previousPosition);
-	Vector2 accelerationComponent = Vector2Scale(acceleration, deltaTime * deltaTime);
+	Vector2 accelerationComponent = Vector2Scale(netAcceleration, deltaTime * deltaTime);
 	position = Vector2Add(positionComponent, accelerationComponent);
 
 	previousPosition = temp;

@@ -11,7 +11,8 @@ public:
 	Vector2 getPosition() const;
 	void setPosition(const Vector2 &newPosition);
 	Vector2 getAcceleration() const;
-	void setAcceleration(const Vector2 &netAcceleration);
+	void setAcceleration(const Vector2 &acceleration);
+	void applyAcceleration(const Vector2 &acceleration);
 
 	void update(float deltaTime);
 	virtual void satisfyConstraints();
@@ -24,5 +25,5 @@ private:
 	Vector2 position;
 	Vector2 previousPosition;
 
-	Vector2 acceleration;
+	Vector2 netAcceleration;
 };
