@@ -10,9 +10,6 @@ public:
 	Stick(Particle *endA, Particle *endB);
 	~Stick();
 
-	Vector2 getAcceleration() const;
-	void setAcceleration(const Vector2 &netAcceleration);
-
 	void satisfyConstraints();
 
 	float determineDeltaLength();
@@ -24,6 +21,5 @@ private:
 	Particle *b;
 
 	float restLength;
-	Vector2 acceleration;
 	static const int satisfyIterations = 1;
 };

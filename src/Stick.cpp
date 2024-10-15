@@ -2,24 +2,12 @@
 
 #include "raymath.h"
 
-Stick::Stick(Particle *endA, Particle *endB) : a(endA), b(endB), acceleration({0.f, 0.f})
+Stick::Stick(Particle *endA, Particle *endB) : a(endA), b(endB)
 {
 	restLength = determineDeltaLength();
 }
 
 Stick::~Stick() {}
-
-Vector2 Stick::getAcceleration() const
-{
-	return acceleration;
-}
-
-void Stick::setAcceleration(const Vector2 &netAcceleration)
-{
-	acceleration = netAcceleration;
-	a->setAcceleration(acceleration);
-	b->setAcceleration(acceleration);
-}
 
 void Stick::satisfyConstraints()
 {
