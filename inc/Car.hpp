@@ -8,7 +8,7 @@ public:
 	Car(const Vector2 &initialPosition);
 	~Car();
 
-	void draw() const;
+	void draw();
 	void update(float dt);
 
 private:
@@ -19,15 +19,27 @@ private:
 	void verletStep(float dt);
 	void satisfyConstraints();
 
+	void drawTuningPanel(Vector2 panelPosition);
+
 	Texture2D texture;
 
 	Vector2 position;
 	Vector2 previousPosition;
+	Vector2 velocity;
+
 	Vector2 netForce;
+	Vector2 driveForce;
+	Vector2 steerForce;
 
-	float throttle;
-	float steering;
+	int throttle;
+	float enginePower; // TODO: add lookup table
+	int steering;
+	float turnSpeed;
+
 	float rotation;
-
-	void drawDebugPanel(Vector2 panelPosition) const; // TODO: rm
+	float mass;
+	float invMass;
+	float slipCoef;
+	float dragCoef;
+	float frictionCoef;
 };

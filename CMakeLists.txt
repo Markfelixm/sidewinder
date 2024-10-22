@@ -39,6 +39,19 @@ inc/*.hpp
 
 add_executable(${PROJECT_NAME} ${SOURCES})
 
+# Debug flags
+# Ensure we are using Debug flags when building in debug mode
+if (NOT CMAKE_BUILD_TYPE)
+  set(CMAKE_BUILD_TYPE Debug)
+endif()
+
+# Set Debug flags (add -O0 to avoid optimizations in debug mode)
+set(CMAKE_CXX_FLAGS_DEBUG "-g -O0 -DDEBUG")
+
+# Release flags
+set(CMAKE_CXX_FLAGS_RELEASE "-O3 -DNDEBUG")
+
+
 target_include_directories(
 	${PROJECT_NAME} 
 	PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/inc
