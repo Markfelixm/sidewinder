@@ -1,5 +1,9 @@
 #pragma once
 
+#include "Point.hpp"
+#include "PointMass.hpp"
+#include "SoftBody.hpp"
+
 #include "raylib.h"
 
 class Game
@@ -12,4 +16,6 @@ public:
 	void update(float deltaTime);
 
 private:
+	SoftBody *softBody;
+	float gravity;
 };

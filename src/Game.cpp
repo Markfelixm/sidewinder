@@ -4,18 +4,32 @@
 #include "raygui.h"
 #include "raymath.h"
 
-Game::Game() {}
+#include <vector>
 
-Game::~Game() {}
+Game::Game() : gravity(0.f)
+{
+	Color someColor = YELLOW;
+	std::vector<PointMass> pointMasses;
+	pointMasses.push_back(PointMass({20.f, 20.f}, 10.f));
+	pointMasses.push_back(PointMass({900.f, 200.f}, 10.f));
+	pointMasses.push_back(PointMass({1100.f, 700.f}, 10.f));
+	pointMasses.push_back(PointMass({200.f, 500.f}, 10.f));
+	softBody = new SoftBody(pointMasses);
+}
+
+Game::~Game()
+{
+	delete softBody;
+}
 
 void Game::draw()
 {
 	BeginDrawing();
 	ClearBackground(RAYWHITE);
 
-	// GuiSlider((Rectangle){10.f + 100, 10.f + 20, 120, 20}, TextFormat("gravity: %.2f", gravity), NULL, &gravity, 0.f, 5000.f);
-	// GuiSlider((Rectangle){10.f + 100, 10.f + 40, 120, 20}, TextFormat("stiffness: %.2f", springStiffness), NULL, &springStiffness, 0.f, 1.f);
-	// GuiSlider((Rectangle){10.f + 100, 10.f + 60, 120, 20}, TextFormat("damping: %.2f", springDamping), NULL, &springDamping, 0.f, 0.5f);
+	GuiSlider((Rectangle){10.f + 100, 10.f + 20, 120, 20}, TextFormat("gravity: %.2f", gravity), NULL, &gravity, 0.f, 1000.f);
+
+	softBody->draw(BLUE, 10.f);
 
 	DrawFPS(GetScreenWidth() - 80, 10);
 	EndDrawing();
@@ -23,4 +37,7 @@ void Game::draw()
 
 void Game::update(float deltaTime)
 {
+	softBody->applyAcceleration({0.f, gravity});
+	softBody->update(deltaTime);
+	softBody->satisfyConstraints();
 }
