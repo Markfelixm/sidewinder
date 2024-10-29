@@ -1,17 +1,18 @@
 #include "SoftBody.hpp"
-#include "Point.hpp"
 
 #include "raymath.h"
 
-SoftBody::SoftBody(const std::vector<PointMass> &pointMasses)
-	: pointMasses(pointMasses),
-	  Shape([&pointMasses]()
+#include <cmath>
+
+SoftBody::SoftBody(std::vector<PointMass> &pointMasses)
+	: Shape([&pointMasses]()
 			{
-			  std::vector<Point> shapePoints;
-			  shapePoints.reserve(pointMasses.size());
-			  for (const auto &pointMass : pointMasses)
-				  shapePoints.push_back(Point(pointMass.getPosition()));
-			  return shapePoints; }()) {}
+			  std::vector<Vector2> shapeVertices;
+			  shapeVertices.reserve(pointMasses.size());
+			  for (auto &pointMass : pointMasses)
+				  shapeVertices.push_back(pointMass.getPosition());
+			  return shapeVertices; }()),
+	  pointMasses(pointMasses) {}
 
 SoftBody::~SoftBody() {}
 
@@ -28,22 +29,17 @@ const Vector2 &SoftBody::getPointMassPositionAt(const size_t index) const
 void SoftBody::applyAcceleration(const Vector2 &acceleration)
 {
 	netAcceleration = Vector2Add(netAcceleration, acceleration);
-	for (size_t i = 0; i < pointMasses.size() && i < points.size(); i++)
-	{
-		pointMasses[i].applyAcceleration(acceleration);
-		points[i].applyAcceleration(acceleration);
-	}
+	for (auto &pointMass : pointMasses)
+		pointMass.applyAcceleration(acceleration);
 }
 
 void SoftBody::update(const float deltaTime)
 {
-	for (size_t i = 0; i < pointMasses.size() && i < points.size(); i++)
-	{
-		pointMasses[i].update(deltaTime);
-		points[i].update(deltaTime);
-	}
+	for (auto &pointMass : pointMasses)
+		pointMass.update(deltaTime);
 	updateCenter();
 	updateRotation();
+	rotate();
 	netAcceleration = {0.f, 0.f};
 }
 
@@ -56,20 +52,42 @@ void SoftBody::satisfyConstraints()
 void SoftBody::draw(const Color &color, const float thickness) const
 {
 	Shape::draw(ColorContrast(color, -0.5f), thickness * 0.8f);
-	if (pointMasses.size() < 0)
-		return;
 
+	if (pointMasses.size() == 0)
+		return;
 	pointMasses.at(0).draw(color, thickness);
-	DrawLineEx(getPointMassPositionAt(0), getPointPositionAt(0), thickness, ColorAlpha(color, 0.3f));
+	DrawLineEx(getPointMassPositionAt(0), getVertexPositionAt(0), thickness, ColorAlpha(color, 0.3f));
 
-	if (pointMasses.size() < 2)
+	if (polars.size() == 1)
 		return;
-
-	for (size_t i = 1; i < pointMasses.size(); i++)
+	const std::vector<Vector2> vertices = getVertices();
+	for (size_t i = 1; i < vertices.size(); i++)
 	{
 		DrawLineEx(getPointMassPositionAt(i - 1), getPointMassPositionAt(i), thickness, color);
-		DrawLineEx(getPointMassPositionAt(i), getPointPositionAt(i), thickness, ColorAlpha(color, 0.3f));
+		DrawLineEx(getPointMassPositionAt(i), vertices.at(i), thickness, ColorAlpha(color, 0.3f));
 		pointMasses.at(i).draw(color, thickness);
 	}
 	DrawLineEx(getPointMassPositionAt(pointMasses.size() - 1), getPointMassPositionAt(0), thickness, color);
+}
+
+void SoftBody::updateCenter()
+{
+	center = {0.f, 0.f};
+	for (const auto &pointMass : pointMasses)
+		center = Vector2Add(center, pointMass.getPosition());
+	center = Vector2Scale(center, 1.f / pointMasses.size());
+}
+
+void SoftBody::updateRotation()
+{
+	previousRotation = rotation;
+	rotation = 0.f;
+	for (size_t i = 0; i < pointMasses.size(); i++)
+	{
+		Vector2 centerToPointMass = Vector2Subtract(getPointMassPositionAt(i), center);
+		Vector2 centerToVertex = Vector2Subtract(getVertexPositionAt(i), center);
+		float angle = Vector2Angle(centerToPointMass, centerToVertex);
+		rotation += angle;
+	}
+	rotation /= pointMasses.size();
 }

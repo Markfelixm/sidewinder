@@ -10,7 +10,7 @@
 class SoftBody : public Shape
 {
 public:
-	SoftBody(const std::vector<PointMass> &pointMasses);
+	SoftBody(std::vector<PointMass> &pointMasses);
 	~SoftBody();
 
 	const size_t getPointMassCount() const;
@@ -24,6 +24,8 @@ public:
 private:
 	SoftBody() = delete;
 
+	void updateCenter();
+	void updateRotation();
+
 	std::vector<PointMass> pointMasses;
-	// TODO: consider polar coordinate references from center of pointMasses to original positions when constructed. this may make points redundant. polar would be easy to rotate
 };

@@ -1,25 +1,42 @@
 #include "Shape.hpp"
 
 #include "raymath.h"
+#include <cmath>
 
-Shape::Shape(const std::vector<Point> &points)
+const Vector2 calculateCenter(const std::vector<Vector2> &vertices);
+Vector2 polarToCartesian(const std::pair<float, float> &polar);
+
+Shape::Shape(const std::vector<Vector2> &vertices) : center(calculateCenter(vertices)), previousCenter(center), netAcceleration({0.f, 0.f}), rotation(0.f), previousRotation(0.f)
 {
-	this->points.reserve(points.size());
-	this->points = points;
-	updateCenter();
-	updateRotation();
+	polars.reserve(vertices.size());
+	for (const auto &vertex : vertices)
+	{
+		Vector2 polarOffset = Vector2Subtract(vertex, center);
+		const float radius = Vector2Length(polarOffset);
+		float angle = atan2f(polarOffset.y, polarOffset.x);
+		polars.emplace_back(radius, angle);
+	}
 }
 
 Shape::~Shape() {}
 
-const size_t Shape::getPointCount() const
+const size_t Shape::getVertexCount() const
 {
-	return points.size();
+	return polars.size();
 }
 
-const Vector2 &Shape::getPointPositionAt(const size_t index) const
+const std::vector<Vector2> Shape::getVertices() const
 {
-	return points.at(index).getPosition();
+	std::vector<Vector2> vertices;
+	vertices.reserve(polars.size());
+	for (const auto &polar : polars)
+		vertices.push_back(polarToCartesian(polar));
+	return vertices;
+}
+
+const Vector2 Shape::getVertexPositionAt(const size_t index) const
+{
+	return polarToCartesian(polars.at(index));
 }
 
 const Vector2 &Shape::getAcceleration() const
@@ -31,6 +48,10 @@ const Vector2 &Shape::getCenterPosition() const
 {
 	return center;
 }
+void Shape::setRotation(const float radians)
+{
+	rotation = radians;
+}
 
 const float Shape::getRotation() const
 {
@@ -40,52 +61,78 @@ const float Shape::getRotation() const
 void Shape::applyAcceleration(const Vector2 &acceleration)
 {
 	netAcceleration = Vector2Add(netAcceleration, acceleration);
-	for (auto point : points)
-		point.applyAcceleration(acceleration);
+}
+
+void Shape::rotate()
+{
+	for (auto &polar : polars)
+		polar.second -= rotation - previousRotation;
 }
 
 void Shape::update(const float deltaTime)
 {
-	for (auto point : points)
-		point.update(deltaTime);
+	// Verlet Integration
+	// x(t + dt) = 2x(t) - x(t - dt) + a * dt * dt
+	Vector2 positionComponent = Vector2Subtract(Vector2Scale(center, 2), previousCenter);
+	Vector2 accelerationComponent = Vector2Scale(netAcceleration, deltaTime * deltaTime);
+	previousCenter = center;
+	center = Vector2Add(positionComponent, accelerationComponent);
+
 	updateCenter();
-	updateRotation();
 	netAcceleration = {0.f, 0.f};
+}
+
+void Shape::satisfyConstraints()
+{
 }
 
 void Shape::draw(const Color &color, const float thickness) const
 {
-	if (points.size() < 0)
+	if (polars.size() == 0)
 		return;
+	DrawCircleV(getVertexPositionAt(0), thickness, color);
 
-	points.at(0).draw(color, thickness);
-
-	if (points.size() < 2)
+	// if there are line segments to draw
+	if (polars.size() == 1)
 		return;
-
-	for (size_t i = 1; i < points.size(); i++)
+	const std::vector<Vector2> vertices = getVertices();
+	for (size_t i = 1; i < vertices.size(); i++)
 	{
-		DrawLineEx(points.at(i - 1).getPosition(), points.at(i).getPosition(), thickness, color);
-		points.at(i).draw(color, thickness);
+		DrawLineEx(vertices.at(i - 1), vertices.at(i), thickness, color);
+		DrawCircleV(vertices.at(i), thickness, color);
 	}
-	DrawLineEx(points.at(points.size() - 1).getPosition(), points.at(0).getPosition(), thickness, color);
-
-	DrawCircleV(center, thickness * 1.2f, ColorBrightness(color, 0.8f));
-	DrawLineEx(center, Vector2Rotate(Vector2Scale(Vector2Normalize(center), 20.f), rotation), 10.f, GREEN);
+	DrawLineEx(vertices.at(vertices.size() - 1), vertices.at(0), thickness, color);
 }
 
 void Shape::updateCenter()
 {
 	center = {0.f, 0.f};
-	for (auto point : points)
-		center = Vector2Add(center, point.getPosition());
-	center = Vector2Scale(center, 1.f / points.size());
+	for (const auto &polar : polars)
+		center = Vector2Add(center, polarToCartesian(polar));
+	center = Vector2Scale(center, 1.f / polars.size());
 }
 
 void Shape::updateRotation()
 {
-	float rotation = 0.f;
-	for (auto point : points)
-		rotation += Vector2LineAngle(Vector2Normalize(center), Vector2Normalize(point.getPosition()));
-	rotation = rotation / points.size();
+	previousRotation = rotation;
+	rotation = 0.f;
+	for (const auto &polar : polars)
+		rotation += polar.second;
+	rotation /= polars.size();
+}
+
+Vector2 Shape::polarToCartesian(const std::pair<float, float> &polar) const
+{
+	return {
+		center.x + polar.first * cosf(polar.second),
+		center.y + polar.first * sinf(polar.second)};
+}
+
+const Vector2 calculateCenter(const std::vector<Vector2> &vertices)
+{
+	Vector2 averageCenter = {0.f, 0.f};
+	for (const auto &vertex : vertices)
+		averageCenter = Vector2Add(averageCenter, vertex);
+	averageCenter = Vector2Scale(averageCenter, 1.f / vertices.size());
+	return averageCenter;
 }

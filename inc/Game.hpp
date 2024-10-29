@@ -1,10 +1,12 @@
 #pragma once
 
-#include "Point.hpp"
 #include "PointMass.hpp"
 #include "SoftBody.hpp"
+#include "Shape.hpp"
 
 #include "raylib.h"
+
+#include <vector>
 
 class Game
 {
@@ -17,5 +19,8 @@ public:
 
 private:
 	SoftBody *softBody;
+	Shape *shape;
 	float gravity;
+	PointMass *point;
+	std::vector<PointMass> pointMasses;
 };
