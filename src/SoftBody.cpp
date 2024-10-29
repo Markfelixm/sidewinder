@@ -2,7 +2,12 @@
 
 #include "raymath.h"
 
-#include <cmath>
+Vector2 calculateSpringForce(
+	const Vector2 &currentPosition,
+	const Vector2 &targetPosition,
+	const Vector2 &currentVelocity,
+	float damping,
+	float stiffness);
 
 SoftBody::SoftBody(std::vector<PointMass> &pointMasses)
 	: Shape([&pointMasses]()
@@ -12,7 +17,9 @@ SoftBody::SoftBody(std::vector<PointMass> &pointMasses)
 			  for (auto &pointMass : pointMasses)
 				  shapeVertices.push_back(pointMass.getPosition());
 			  return shapeVertices; }()),
-	  pointMasses(pointMasses) {}
+	  pointMasses(pointMasses),
+	  stiffness(0.9f),
+	  damping(0.1f) {}
 
 SoftBody::~SoftBody() {}
 
@@ -24,6 +31,16 @@ const size_t SoftBody::getPointMassCount() const
 const Vector2 &SoftBody::getPointMassPositionAt(const size_t index) const
 {
 	return pointMasses.at(index).getPosition();
+}
+
+void SoftBody::setStiffness(const float newStiffness)
+{
+	stiffness = newStiffness;
+}
+
+void SoftBody::setDamping(const float newDamping)
+{
+	damping = newDamping;
 }
 
 void SoftBody::applyAcceleration(const Vector2 &acceleration)
@@ -45,13 +62,28 @@ void SoftBody::update(const float deltaTime)
 
 void SoftBody::satisfyConstraints()
 {
+	// Vector2 averageSpringForces = {0.f, 0.f};
+	for (size_t i = 0; i < pointMasses.size(); i++)
+	{
+		Vector2 springForce = calculateSpringForce(pointMasses.at(i).getPosition(),
+												   getVertexPositionAt(i),
+												   pointMasses.at(i).determineVelocity(),
+												   stiffness,
+												   damping);
+		pointMasses.at(i).setPosition(Vector2Add(pointMasses.at(i).getPosition(), springForce));
+		// TODO: experiment with spring forces on center
+		// averageSpringForces = Vector2Add(averageSpringForces, springForce);
+	}
+	// averageSpringForces = Vector2Scale(averageSpringForces, 1.f / pointMasses.size());
+	// center = Vector2Subtract(center, averageSpringForces);
+
 	for (auto &pointMass : pointMasses)
 		pointMass.satisfyConstraints();
 }
 
 void SoftBody::draw(const Color &color, const float thickness) const
 {
-	Shape::draw(ColorContrast(color, -0.5f), thickness * 0.8f);
+	Shape::draw(ColorAlpha(ColorContrast(color, -0.5f), 0.4f), thickness * 0.8f);
 
 	if (pointMasses.size() == 0)
 		return;
@@ -90,4 +122,21 @@ void SoftBody::updateRotation()
 		rotation += angle;
 	}
 	rotation /= pointMasses.size();
+}
+
+Vector2 calculateSpringForce(
+	const Vector2 &currentPosition,
+	const Vector2 &targetPosition,
+	const Vector2 &currentVelocity,
+	float damping,
+	float stiffness)
+{
+	// simple damped harmonic motion
+	// F = -stiffness * displacement - damping * velocity
+	Vector2 displacement = Vector2Subtract(targetPosition, currentPosition);
+	Vector2 springForce = Vector2Scale(displacement, stiffness);
+	Vector2 dampingForce = Vector2Scale(currentVelocity, damping);
+	Vector2 totalForce = Vector2Subtract(springForce, dampingForce);
+
+	return totalForce;
 }

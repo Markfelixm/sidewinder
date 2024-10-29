@@ -15,6 +15,8 @@ public:
 
 	const size_t getPointMassCount() const;
 	const Vector2 &getPointMassPositionAt(const size_t index) const;
+	void setStiffness(const float newStiffness);
+	void setDamping(const float newDamping);
 
 	virtual void applyAcceleration(const Vector2 &acceleration);
 	virtual void update(const float deltaTime);
@@ -28,4 +30,6 @@ private:
 	void updateRotation();
 
 	std::vector<PointMass> pointMasses;
+	float stiffness;
+	float damping;
 };

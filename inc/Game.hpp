@@ -18,9 +18,9 @@ public:
 	void update(float deltaTime);
 
 private:
-	SoftBody *softBody;
-	Shape *shape;
 	float gravity;
-	PointMass *point;
 	std::vector<PointMass> pointMasses;
+	SoftBody *softBody;
+	float softBodyStiffness;
+	float softBodyDamping;
 };
