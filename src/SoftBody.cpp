@@ -113,15 +113,16 @@ void SoftBody::updateCenter()
 void SoftBody::updateRotation()
 {
 	previousRotation = rotation;
-	rotation = 0.f;
+	float averageRotationalOffset = 0.f;
 	for (size_t i = 0; i < pointMasses.size(); i++)
 	{
 		Vector2 centerToPointMass = Vector2Subtract(getPointMassPositionAt(i), center);
 		Vector2 centerToVertex = Vector2Subtract(getVertexPositionAt(i), center);
 		float angle = Vector2Angle(centerToPointMass, centerToVertex);
-		rotation += angle;
+		averageRotationalOffset += angle;
 	}
-	rotation /= pointMasses.size();
+	averageRotationalOffset /= pointMasses.size();
+	rotation += averageRotationalOffset;
 }
 
 Vector2 calculateSpringForce(
