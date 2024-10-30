@@ -23,4 +23,6 @@ private:
 	SoftBody *softBody;
 	float softBodyStiffness;
 	float softBodyDamping;
+	Color softBodyColor;
+	float dragStrength;
 };

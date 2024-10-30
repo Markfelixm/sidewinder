@@ -19,7 +19,8 @@ SoftBody::SoftBody(std::vector<PointMass> &pointMasses)
 			  return shapeVertices; }()),
 	  pointMasses(pointMasses),
 	  stiffness(0.9f),
-	  damping(0.1f) {}
+	  damping(0.1f),
+	  bounds(Shapes::BoundingBox(pointMasses)) {}
 
 SoftBody::~SoftBody() {}
 
@@ -33,6 +34,15 @@ const Vector2 &SoftBody::getPointMassPositionAt(const size_t index) const
 	return pointMasses.at(index).getPosition();
 }
 
+const std::vector<Vector2> SoftBody::getPointMassPositions() const
+{
+	std::vector<Vector2> positions;
+	positions.resize(pointMasses.size());
+	for (const auto &pointMass : pointMasses)
+		positions.push_back(pointMass.getPosition());
+	return positions;
+}
+
 void SoftBody::setStiffness(const float newStiffness)
 {
 	stiffness = newStiffness;
@@ -41,6 +51,11 @@ void SoftBody::setStiffness(const float newStiffness)
 void SoftBody::setDamping(const float newDamping)
 {
 	damping = newDamping;
+}
+
+const Shapes::BoundingBox &SoftBody::getBoundingBox() const
+{
+	return bounds;
 }
 
 void SoftBody::applyAcceleration(const Vector2 &acceleration)
@@ -54,9 +69,12 @@ void SoftBody::update(const float deltaTime)
 {
 	for (auto &pointMass : pointMasses)
 		pointMass.update(deltaTime);
+	bounds.resize(pointMasses);
+
 	updateCenter();
 	updateRotation();
 	rotate();
+
 	netAcceleration = {0.f, 0.f};
 }
 
@@ -65,12 +83,12 @@ void SoftBody::satisfyConstraints()
 	// Vector2 averageSpringForces = {0.f, 0.f};
 	for (size_t i = 0; i < pointMasses.size(); i++)
 	{
-		Vector2 springForce = calculateSpringForce(pointMasses.at(i).getPosition(),
+		Vector2 springForce = calculateSpringForce(getPointMassPositionAt(i),
 												   getVertexPositionAt(i),
 												   pointMasses.at(i).determineVelocity(),
 												   stiffness,
 												   damping);
-		pointMasses.at(i).setPosition(Vector2Add(pointMasses.at(i).getPosition(), springForce));
+		pointMasses.at(i).setPosition(Vector2Add(getPointMassPositionAt(i), springForce));
 		// TODO: experiment with spring forces on center
 		// averageSpringForces = Vector2Add(averageSpringForces, springForce);
 	}
@@ -100,6 +118,15 @@ void SoftBody::draw(const Color &color, const float thickness) const
 		pointMasses.at(i).draw(color, thickness);
 	}
 	DrawLineEx(getPointMassPositionAt(pointMasses.size() - 1), getPointMassPositionAt(0), thickness, color);
+}
+
+void SoftBody::moveCenter(const Vector2 newPosition, const float strength)
+{
+	Vector2 displacement = Vector2Subtract(newPosition, center);
+	for (auto &pointMass : pointMasses)
+		pointMass.applyAcceleration(Vector2Scale(displacement, strength));
+	// pointMass.setPosition(Vector2Add(pointMass.getPosition(), displacement));
+	center = newPosition;
 }
 
 void SoftBody::updateCenter()
