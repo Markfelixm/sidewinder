@@ -15,6 +15,11 @@ namespace Shapes
 		BoundingBox(const std::vector<PointMass> &pointMasses);
 		~BoundingBox();
 
+		float getLeft() const;
+		float getRight() const;
+		float getTop() const;
+		float getBottom() const;
+
 		void resize(const std::vector<PointMass> &pointMasses);
 		bool contains(const Vector2 &point) const;
 		bool intersects(const BoundingBox &otherBox) const;

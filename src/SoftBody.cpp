@@ -2,6 +2,8 @@
 
 #include "raymath.h"
 
+bool intersects(const Vector2 &point, const Vector2 &p1, const Vector2 &p2);
+
 Vector2 calculateSpringForce(
 	const Vector2 &currentPosition,
 	const Vector2 &targetPosition,
@@ -80,7 +82,6 @@ void SoftBody::update(const float deltaTime)
 
 void SoftBody::satisfyConstraints()
 {
-	// Vector2 averageSpringForces = {0.f, 0.f};
 	for (size_t i = 0; i < pointMasses.size(); i++)
 	{
 		Vector2 springForce = calculateSpringForce(getPointMassPositionAt(i),
@@ -89,11 +90,7 @@ void SoftBody::satisfyConstraints()
 												   stiffness,
 												   damping);
 		pointMasses.at(i).setPosition(Vector2Add(getPointMassPositionAt(i), springForce));
-		// TODO: experiment with spring forces on center
-		// averageSpringForces = Vector2Add(averageSpringForces, springForce);
 	}
-	// averageSpringForces = Vector2Scale(averageSpringForces, 1.f / pointMasses.size());
-	// center = Vector2Subtract(center, averageSpringForces);
 
 	for (auto &pointMass : pointMasses)
 		pointMass.satisfyConstraints();
@@ -105,15 +102,10 @@ void SoftBody::draw(const Color &color, const float thickness) const
 
 	if (pointMasses.size() == 0)
 		return;
-	pointMasses.at(0).draw(color, thickness);
-	DrawLineEx(getPointMassPositionAt(0), getVertexPositionAt(0), thickness, ColorAlpha(color, 0.3f));
-
-	if (polars.size() == 1)
-		return;
 	const std::vector<Vector2> vertices = getVertices();
-	for (size_t i = 1; i < vertices.size(); i++)
+	for (size_t i = 0; i < vertices.size(); i++)
 	{
-		DrawLineEx(getPointMassPositionAt(i - 1), getPointMassPositionAt(i), thickness, color);
+		DrawLineEx(getPointMassPositionAt(i), getPointMassPositionAt((i + 1) % pointMasses.size()), thickness, color);
 		DrawLineEx(getPointMassPositionAt(i), vertices.at(i), thickness, ColorAlpha(color, 0.3f));
 		pointMasses.at(i).draw(color, thickness);
 	}
@@ -125,7 +117,6 @@ void SoftBody::moveCenter(const Vector2 newPosition, const float strength)
 	Vector2 displacement = Vector2Subtract(newPosition, center);
 	for (auto &pointMass : pointMasses)
 		pointMass.applyAcceleration(Vector2Scale(displacement, strength));
-	// pointMass.setPosition(Vector2Add(pointMass.getPosition(), displacement));
 	center = newPosition;
 }
 
@@ -167,4 +158,44 @@ Vector2 calculateSpringForce(
 	Vector2 totalForce = Vector2Subtract(springForce, dampingForce);
 
 	return totalForce;
+}
+
+bool SoftBody::contains(const Vector2 &point) const
+{
+	// horizontal even-odd collision check
+	int intersectionCount = 0;
+
+	for (size_t i = 0; i < pointMasses.size(); i++)
+	{
+		// check if point to horizontal right intersects neighboring pointMasses
+		if (intersects(point,
+					   getPointMassPositionAt(i),
+					   getPointMassPositionAt((i + 1) % pointMasses.size())))
+			intersectionCount++;
+	}
+
+	return (intersectionCount % 2) == 1;
+}
+
+bool intersects(const Vector2 &point, const Vector2 &p1, const Vector2 &p2)
+{
+	Vector2 lower = p1;
+	Vector2 upper = p2;
+
+	if (p1.y > p2.y)
+	{
+		lower = p2;
+		upper = p1;
+	}
+
+	if (point.y < lower.y || point.y > upper.y || (upper.y - lower.y) == 0.f)
+		return false;
+
+	// for horizontal line against non-horizontal line
+	// x-intersect = lower.x + (y-intersect - lower.y) * dx/dy
+	// where y-intersect is known as point.y
+	float intersectX = lower.x + (point.y - lower.y) * (upper.x - lower.x) / (upper.y - lower.y);
+
+	// if x-intersect is to the right of point.x the lines intersect
+	return intersectX > point.x;
 }

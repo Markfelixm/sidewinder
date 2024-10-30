@@ -90,15 +90,11 @@ void Shape::draw(const Color &color, const float thickness) const
 {
 	if (polars.size() == 0)
 		return;
-	DrawCircleV(getVertexPositionAt(0), thickness, color);
 
-	// if there are line segments to draw
-	if (polars.size() == 1)
-		return;
 	const std::vector<Vector2> vertices = getVertices();
-	for (size_t i = 1; i < vertices.size(); i++)
+	for (size_t i = 0; i < vertices.size(); i++)
 	{
-		DrawLineEx(vertices.at(i - 1), vertices.at(i), thickness, color);
+		DrawLineEx(vertices.at(i), vertices.at((i + 1) % vertices.size()), thickness, color);
 		DrawCircleV(vertices.at(i), thickness, color);
 	}
 	DrawLineEx(vertices.at(vertices.size() - 1), vertices.at(0), thickness, color);

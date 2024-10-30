@@ -27,6 +27,7 @@ public:
 	virtual void draw(const Color &color, const float thickness) const;
 
 	void moveCenter(const Vector2 newPosition, const float strength);
+	bool contains(const Vector2 &point) const;
 
 private:
 	SoftBody() = delete;

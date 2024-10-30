@@ -20,7 +20,7 @@ public:
 private:
 	float gravity;
 	std::vector<PointMass> pointMasses;
-	SoftBody *softBody;
+	std::unique_ptr<SoftBody> softBody;
 	float softBodyStiffness;
 	float softBodyDamping;
 	Color softBodyColor;

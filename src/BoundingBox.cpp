@@ -12,6 +12,26 @@ namespace Shapes
 
 	BoundingBox::~BoundingBox() {}
 
+	float BoundingBox::getLeft() const
+	{
+		return topLeft.x;
+	}
+
+	float BoundingBox::getRight() const
+	{
+		return bottomRight.x;
+	}
+
+	float BoundingBox::getTop() const
+	{
+		return topLeft.y;
+	}
+
+	float BoundingBox::getBottom() const
+	{
+		return bottomRight.y;
+	}
+
 	void BoundingBox::resize(const std::vector<PointMass> &pointMasses)
 	{
 		topLeft = pointMasses.at(0).getPosition();
