@@ -2,7 +2,7 @@
 
 #include "raymath.h"
 
-PointMass::PointMass(const Vector2 &initialPosition, float mass) : position(initialPosition), previousPosition(initialPosition), netAcceleration({0.f, 0.f}), mass(mass) {}
+PointMass::PointMass(const Vector2 &initialPosition, const float mass) : position(initialPosition), previousPosition(initialPosition), netAcceleration({0.f, 0.f}), mass(mass), inverseMass(1.f / mass) {}
 
 PointMass::~PointMass() {}
 
@@ -11,9 +11,14 @@ void PointMass::setMass(const float newMass)
 	mass = newMass;
 }
 
-float PointMass::getMass() const
+const float PointMass::getMass() const
 {
 	return mass;
+}
+
+const float PointMass::getInverseMass() const
+{
+	return inverseMass;
 }
 
 void PointMass::setPosition(const Vector2 &newPosition)
@@ -61,5 +66,4 @@ void PointMass::draw(const Color &color, const float radius) const
 void PointMass::satisfyConstraints()
 {
 	position = Vector2Clamp(position, {0.f, 0.f}, {static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())});
-	// TODO: update previousPosition?
 }
