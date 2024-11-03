@@ -1,6 +1,7 @@
 # Sidewinder
 
-A top-down car drifting game made in C/C++ with raylib.  
+A softbody simulation based on [JellyCar's developer's vlog](https://www.youtube.com/watch?v=3OmkehAJoyo).  
+Made in C/C++ with raylib.  
 It can be played natively or in the browser.
 
 <!-- TODO: web link
@@ -8,11 +9,7 @@ TODO: screenshot -->
 
 ## Controls
 
-Arrow keys:
-
-- UP - accelerate
-- DOWN - brake
-- LEFT / RIGHT - turn
+TBD
 
 ## Prerequisites
 
