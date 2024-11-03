@@ -18,11 +18,16 @@ public:
 	void update(float deltaTime);
 
 private:
-	float gravity;
-	std::vector<PointMass> pointMasses;
-	std::unique_ptr<SoftBody> softBody;
+	Vector2 gravity;
+	float gravityStrength;
+	std::vector<PointMass> heartMasses;
+	std::unique_ptr<SoftBody> heart;
+	std::vector<PointMass> boxMasses;
+	std::unique_ptr<SoftBody> box;
 	float softBodyStiffness;
 	float softBodyDamping;
 	Color softBodyColor;
-	float dragStrength;
+
+	PointMass collider;
+	float colliderMass;
 };

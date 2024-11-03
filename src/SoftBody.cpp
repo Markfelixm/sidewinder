@@ -2,8 +2,15 @@
 
 #include "raymath.h"
 
-bool intersects(const Vector2 &point, const Vector2 &p1, const Vector2 &p2);
+#include <cmath>
+#include <limits>
 
+// TODO: find bug coupling stiffness, gravity, and velocity
+// TODO: abstract physics and collision utilities
+
+const bool isHorizontalIntersect(const Vector2 &point, const Vector2 &a, const Vector2 &b);
+const float projectionRatio(const Vector2 &point, const Vector2 &a, const Vector2 &b);
+const float distanceToLine(const Vector2 &point, const Vector2 &a, const Vector2 &b, const bool useOptimization);
 Vector2 calculateSpringForce(
 	const Vector2 &currentPosition,
 	const Vector2 &targetPosition,
@@ -20,8 +27,22 @@ SoftBody::SoftBody(std::vector<PointMass> &pointMasses)
 				  shapeVertices.push_back(pointMass.getPosition());
 			  return shapeVertices; }()),
 	  pointMasses(pointMasses),
-	  stiffness(0.9f),
-	  damping(0.1f),
+	  stiffness(0.1f),
+	  damping(0.01f),
+	  bounds(Shapes::BoundingBox(pointMasses)) {}
+
+// TODO: dont repeat
+SoftBody::SoftBody(std::vector<PointMass> &pointMasses, const float stiffness, const float damping)
+	: Shape([&pointMasses]()
+			{
+			  std::vector<Vector2> shapeVertices;
+			  shapeVertices.reserve(pointMasses.size());
+			  for (auto &pointMass : pointMasses)
+				  shapeVertices.push_back(pointMass.getPosition());
+			  return shapeVertices; }()),
+	  pointMasses(pointMasses),
+	  stiffness(stiffness),
+	  damping(damping),
 	  bounds(Shapes::BoundingBox(pointMasses)) {}
 
 SoftBody::~SoftBody() {}
@@ -75,7 +96,7 @@ void SoftBody::update(const float deltaTime)
 
 	updateCenter();
 	updateRotation();
-	rotate();
+	updatePolars();
 
 	netAcceleration = {0.f, 0.f};
 }
@@ -89,6 +110,7 @@ void SoftBody::satisfyConstraints()
 												   pointMasses.at(i).determineVelocity(),
 												   stiffness,
 												   damping);
+		springForce = Vector2Scale(springForce, 0.5);
 		pointMasses.at(i).setPosition(Vector2Add(getPointMassPositionAt(i), springForce));
 	}
 
@@ -120,6 +142,87 @@ void SoftBody::moveCenter(const Vector2 newPosition, const float strength)
 	center = newPosition;
 }
 
+void SoftBody::handleSoftBodyCollision(SoftBody &other)
+{
+	if (!bounds.intersects(other.getBoundingBox()))
+		return;
+	for (auto &pointMass : pointMasses)
+	{
+		if (other.contains(pointMass.getPosition()))
+			other.resolveCollision(pointMass);
+	}
+}
+
+bool SoftBody::contains(const Vector2 &point) const
+{
+	// horizontal even-odd collision check
+	int intersectionCount = 0;
+
+	for (size_t i = 0; i < pointMasses.size(); i++)
+	{
+		// check if point to horizontal right intersects neighboring pointMasses
+		if (isHorizontalIntersect(point,
+								  getPointMassPositionAt(i),
+								  getPointMassPositionAt((i + 1) % pointMasses.size())))
+			intersectionCount++;
+	}
+
+	return (intersectionCount % 2) == 1;
+}
+
+void SoftBody::resolveCollision(PointMass &collider)
+{
+	// determine direction and magnitude of collision
+	std::pair<PointMass &, PointMass &> edge = findNearestEdge(collider.getPosition());
+
+	const float collisionRatio = projectionRatio(collider.getPosition(),
+												 edge.first.getPosition(),
+												 edge.second.getPosition());
+	Vector2 edgeLine = Vector2Subtract(edge.second.getPosition(), edge.first.getPosition());
+	Vector2 collisionPoint = Vector2Add(edge.first.getPosition(), Vector2Scale(edgeLine, collisionRatio));
+
+	const Vector2 collisionNormal = Vector2Normalize(Vector2Subtract(collisionPoint, collider.getPosition()));
+	const float penetrationDepth = Vector2Distance(collider.getPosition(), collisionPoint);
+
+	// resolve collider and edge proportional to mass
+	const float edgeMass = edge.first.getMass() + edge.second.getMass();
+	const float totalMass = collider.getMass() + edgeMass;
+	const float colliderResolutionDistance = penetrationDepth * edgeMass / totalMass;
+	const float edgeResolutionDistance = penetrationDepth - colliderResolutionDistance;
+	// also take into account the closeness of the collision point to either end of the edge
+	const float positionOffset = collisionRatio * 2.f - 1.f;
+
+	// resolve positions
+	edge.first.setPosition(Vector2Add(edge.first.getPosition(), Vector2Scale(collisionNormal, -1.f * edgeResolutionDistance)));
+	edge.second.setPosition(Vector2Add(edge.second.getPosition(), Vector2Scale(collisionNormal, -1.f * edgeResolutionDistance)));
+	collider.setPosition(Vector2Add(collider.getPosition(), Vector2Scale(collisionNormal, colliderResolutionDistance)));
+
+	// TODO: maybe apply elastic collision velocities. verlet integration with springs already seems to make for inelastic looking collisions
+}
+
+std::pair<PointMass &, PointMass &> SoftBody::findNearestEdge(const Vector2 &point)
+{
+	float minDistance = std::numeric_limits<float>::max();
+	size_t nearestIndex = 0;
+
+	for (size_t i = 0; i < pointMasses.size(); i++)
+	{
+		float distance = distanceToLine(point,
+										getPointMassPositionAt(i),
+										getPointMassPositionAt((i + 1) % pointMasses.size()),
+										true);
+
+		if (distance < minDistance)
+		{
+			minDistance = distance;
+			nearestIndex = i;
+		}
+	}
+
+	return std::pair<PointMass &, PointMass &>(pointMasses.at(nearestIndex),
+											   pointMasses.at((nearestIndex + 1) % pointMasses.size()));
+}
+
 void SoftBody::updateCenter()
 {
 	center = {0.f, 0.f};
@@ -141,6 +244,51 @@ void SoftBody::updateRotation()
 	}
 	averageRotationalOffset /= pointMasses.size();
 	rotation += averageRotationalOffset;
+	rotation = fmodf(rotation, 2.f * PI);
+}
+
+const bool isHorizontalIntersect(const Vector2 &point, const Vector2 &a, const Vector2 &b)
+{
+	Vector2 lower = a;
+	Vector2 upper = b;
+
+	if (a.y > b.y)
+	{
+		lower = b;
+		upper = a;
+	}
+
+	if (point.y < lower.y || point.y > upper.y || (upper.y - lower.y) == 0.f)
+		return false;
+
+	// for horizontal line against non-horizontal line
+	// x-intersect = lower.x + (y-intersect - lower.y) * dx/dy
+	// where y-intersect is known as point.y
+	float intersectX = lower.x + (point.y - lower.y) * (upper.x - lower.x) / (upper.y - lower.y);
+
+	// if x-intersect is to the right of point.x the lines intersect
+	return intersectX > point.x;
+}
+
+const float distanceToLine(const Vector2 &point, const Vector2 &a, const Vector2 &b, const bool useOptimization)
+{
+	// equation described by sebastian lague https://www.youtube.com/watch?v=KHuI9bXZS74
+	float numerator = fabsf((point.x - a.x) * (-1.f * b.y + a.y) + (point.y - a.y) * (b.x - a.x));
+	if (useOptimization)
+		return numerator;
+
+	float denominator = sqrtf((-b.y + a.y) * (-b.y + a.y) + (b.x - a.x) * (b.x - a.x));
+	return fabsf(numerator / denominator);
+}
+
+const float projectionRatio(const Vector2 &point, const Vector2 &a, const Vector2 &b)
+{
+	// if point were to be projected onto line AB, the ratio is its closeness to A
+	Vector2 aToB = Vector2Subtract(b, a);
+	Vector2 aToPoint = Vector2Subtract(point, a);
+
+	float t = Vector2DotProduct(aToPoint, aToB) / Vector2LengthSqr(aToB);
+	return std::fmax(0.f, std::fmin(1.0f, t));
 }
 
 Vector2 calculateSpringForce(
@@ -158,44 +306,4 @@ Vector2 calculateSpringForce(
 	Vector2 totalForce = Vector2Subtract(springForce, dampingForce);
 
 	return totalForce;
-}
-
-bool SoftBody::contains(const Vector2 &point) const
-{
-	// horizontal even-odd collision check
-	int intersectionCount = 0;
-
-	for (size_t i = 0; i < pointMasses.size(); i++)
-	{
-		// check if point to horizontal right intersects neighboring pointMasses
-		if (intersects(point,
-					   getPointMassPositionAt(i),
-					   getPointMassPositionAt((i + 1) % pointMasses.size())))
-			intersectionCount++;
-	}
-
-	return (intersectionCount % 2) == 1;
-}
-
-bool intersects(const Vector2 &point, const Vector2 &p1, const Vector2 &p2)
-{
-	Vector2 lower = p1;
-	Vector2 upper = p2;
-
-	if (p1.y > p2.y)
-	{
-		lower = p2;
-		upper = p1;
-	}
-
-	if (point.y < lower.y || point.y > upper.y || (upper.y - lower.y) == 0.f)
-		return false;
-
-	// for horizontal line against non-horizontal line
-	// x-intersect = lower.x + (y-intersect - lower.y) * dx/dy
-	// where y-intersect is known as point.y
-	float intersectX = lower.x + (point.y - lower.y) * (upper.x - lower.x) / (upper.y - lower.y);
-
-	// if x-intersect is to the right of point.x the lines intersect
-	return intersectX > point.x;
 }

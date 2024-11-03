@@ -63,7 +63,7 @@ void Shape::applyAcceleration(const Vector2 &acceleration)
 	netAcceleration = Vector2Add(netAcceleration, acceleration);
 }
 
-void Shape::rotate()
+void Shape::updatePolars()
 {
 	for (auto &polar : polars)
 		polar.second -= rotation - previousRotation;

@@ -20,7 +20,7 @@ public:
 	const float getRotation() const;
 
 	virtual void applyAcceleration(const Vector2 &acceleration);
-	void rotate();
+	void updatePolars();
 	virtual void update(const float deltaTime);
 	virtual void satisfyConstraints();
 	virtual void draw(const Color &color, const float thickness) const;

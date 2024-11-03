@@ -7,11 +7,13 @@
 #include "raylib.h"
 
 #include <vector>
+#include <utility>
 
 class SoftBody : public Shape
 {
 public:
 	SoftBody(std::vector<PointMass> &pointMasses);
+	SoftBody(std::vector<PointMass> &pointMasses, const float stiffness, const float damping);
 	~SoftBody();
 
 	const size_t getPointMassCount() const;
@@ -27,7 +29,10 @@ public:
 	virtual void draw(const Color &color, const float thickness) const;
 
 	void moveCenter(const Vector2 newPosition, const float strength);
+	void handleSoftBodyCollision(SoftBody &other);
 	bool contains(const Vector2 &point) const;
+	void resolveCollision(PointMass &collider);
+	std::pair<PointMass &, PointMass &> findNearestEdge(const Vector2 &point);
 
 private:
 	SoftBody() = delete;
