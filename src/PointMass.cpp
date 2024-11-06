@@ -65,5 +65,5 @@ void PointMass::draw(const Color &color, const float radius) const
 
 void PointMass::satisfyConstraints()
 {
-	position = Vector2Clamp(position, {0.f, 0.f}, {static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())});
+	// position = Vector2Clamp(position, {0.f, 0.f}, {static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())});
 }

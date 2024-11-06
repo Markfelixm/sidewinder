@@ -18,20 +18,6 @@ Vector2 calculateSpringForce(
 	float damping,
 	float stiffness);
 
-SoftBody::SoftBody(std::vector<PointMass> &pointMasses)
-	: Shape([&pointMasses]()
-			{
-			  std::vector<Vector2> shapeVertices;
-			  shapeVertices.reserve(pointMasses.size());
-			  for (auto &pointMass : pointMasses)
-				  shapeVertices.push_back(pointMass.getPosition());
-			  return shapeVertices; }()),
-	  pointMasses(pointMasses),
-	  stiffness(0.1f),
-	  damping(0.01f),
-	  bounds(Shapes::BoundingBox(pointMasses)) {}
-
-// TODO: dont repeat
 SoftBody::SoftBody(std::vector<PointMass> &pointMasses, const float stiffness, const float damping)
 	: Shape([&pointMasses]()
 			{
@@ -43,7 +29,7 @@ SoftBody::SoftBody(std::vector<PointMass> &pointMasses, const float stiffness, c
 	  pointMasses(pointMasses),
 	  stiffness(stiffness),
 	  damping(damping),
-	  bounds(Shapes::BoundingBox(pointMasses)) {}
+	  bounds(Sidewinder::BoundingBox(getPointMassPositions())) {}
 
 SoftBody::~SoftBody() {}
 
@@ -76,7 +62,7 @@ void SoftBody::setDamping(const float newDamping)
 	damping = newDamping;
 }
 
-const Shapes::BoundingBox &SoftBody::getBoundingBox() const
+const Sidewinder::BoundingBox &SoftBody::getBoundingBox() const
 {
 	return bounds;
 }
@@ -92,7 +78,7 @@ void SoftBody::update(const float deltaTime)
 {
 	for (auto &pointMass : pointMasses)
 		pointMass.update(deltaTime);
-	bounds.resize(pointMasses);
+	bounds.resize(getPointMassPositions());
 
 	updateCenter();
 	updateRotation();

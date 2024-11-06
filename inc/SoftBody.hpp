@@ -12,7 +12,6 @@
 class SoftBody : public Shape
 {
 public:
-	SoftBody(std::vector<PointMass> &pointMasses);
 	SoftBody(std::vector<PointMass> &pointMasses, const float stiffness, const float damping);
 	~SoftBody();
 
@@ -21,7 +20,7 @@ public:
 	const std::vector<Vector2> getPointMassPositions() const;
 	void setStiffness(const float newStiffness);
 	void setDamping(const float newDamping);
-	const Shapes::BoundingBox &getBoundingBox() const;
+	const Sidewinder::BoundingBox &getBoundingBox() const;
 
 	virtual void applyAcceleration(const Vector2 &acceleration);
 	virtual void update(const float deltaTime);
@@ -44,5 +43,5 @@ private:
 	float stiffness;
 	float damping;
 
-	Shapes::BoundingBox bounds;
+	Sidewinder::BoundingBox bounds;
 };

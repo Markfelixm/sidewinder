@@ -6,13 +6,13 @@
 
 #include <vector>
 
-namespace Shapes
+namespace Sidewinder
 {
 
 	class BoundingBox
 	{
 	public:
-		BoundingBox(const std::vector<PointMass> &pointMasses);
+		BoundingBox(const std::vector<Vector2> &vertices);
 		~BoundingBox();
 
 		float getLeft() const;
@@ -20,7 +20,7 @@ namespace Shapes
 		float getTop() const;
 		float getBottom() const;
 
-		void resize(const std::vector<PointMass> &pointMasses);
+		void resize(const std::vector<Vector2> &vertices);
 		bool contains(const Vector2 &point) const;
 		bool intersects(const BoundingBox &otherBox) const;
 

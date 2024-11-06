@@ -2,12 +2,12 @@
 
 #include <algorithm>
 
-namespace Shapes
+namespace Sidewinder
 {
 
-	BoundingBox::BoundingBox(const std::vector<PointMass> &pointMasses) : topLeft({0.f, 0.f}), bottomRight({0.f, 0.f})
+	BoundingBox::BoundingBox(const std::vector<Vector2> &vertices) : topLeft({0.f, 0.f}), bottomRight({0.f, 0.f})
 	{
-		resize(pointMasses);
+		resize(vertices);
 	}
 
 	BoundingBox::~BoundingBox() {}
@@ -32,17 +32,17 @@ namespace Shapes
 		return bottomRight.y;
 	}
 
-	void BoundingBox::resize(const std::vector<PointMass> &pointMasses)
+	void BoundingBox::resize(const std::vector<Vector2> &vertices)
 	{
-		topLeft = pointMasses.at(0).getPosition();
-		bottomRight = pointMasses.at(0).getPosition();
+		topLeft = vertices.at(0);
+		bottomRight = vertices.at(0);
 
-		for (const auto &pointMass : pointMasses)
+		for (const auto &vertex : vertices)
 		{
-			topLeft.x = std::min(topLeft.x, pointMass.getPosition().x);
-			topLeft.y = std::min(topLeft.y, pointMass.getPosition().y);
-			bottomRight.x = std::max(bottomRight.x, pointMass.getPosition().x);
-			bottomRight.y = std::max(bottomRight.y, pointMass.getPosition().y);
+			topLeft.x = std::min(topLeft.x, vertex.x);
+			topLeft.y = std::min(topLeft.y, vertex.y);
+			bottomRight.x = std::max(bottomRight.x, vertex.x);
+			bottomRight.y = std::max(bottomRight.y, vertex.y);
 		}
 	}
 
