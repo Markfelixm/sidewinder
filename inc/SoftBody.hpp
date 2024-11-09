@@ -9,10 +9,15 @@
 #include <vector>
 #include <utility>
 
+namespace Sidewinder
+{
+	class Camera;
+}
+
 class SoftBody : public Shape
 {
 public:
-	SoftBody(std::vector<PointMass> &pointMasses, const float stiffness, const float damping);
+	SoftBody(std::vector<PointMass> &pointMasses);
 	~SoftBody();
 
 	const size_t getPointMassCount() const;
@@ -20,12 +25,13 @@ public:
 	const std::vector<Vector2> getPointMassPositions() const;
 	void setStiffness(const float newStiffness);
 	void setDamping(const float newDamping);
+	void setColor(const Color &newColor);
 	const Sidewinder::BoundingBox &getBoundingBox() const;
 
 	virtual void applyAcceleration(const Vector2 &acceleration);
 	virtual void update(const float deltaTime);
 	virtual void satisfyConstraints();
-	virtual void draw(const Color &color, const float thickness) const;
+	virtual void draw(const Sidewinder::Camera &camera) const;
 
 	void moveCenter(const Vector2 newPosition, const float strength);
 	void handleSoftBodyCollision(SoftBody &other);
@@ -43,5 +49,6 @@ private:
 	float stiffness;
 	float damping;
 
+	Color color;
 	Sidewinder::BoundingBox bounds;
 };

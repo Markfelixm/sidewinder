@@ -1,7 +1,7 @@
 #pragma once
 
+#include "World.hpp"
 #include "BoundingBox.hpp"
-#include "Entity.hpp"
 
 #include "raylib.h"
 
@@ -11,26 +11,25 @@ namespace Sidewinder
 	class Camera
 	{
 	public:
-		Camera(const std::vector<Vector2> &viewCorners);
+		Camera(const World &world);
 		~Camera();
 
 		const Sidewinder::BoundingBox &getBoundingBox() const;
+		const Vector2 getCameraCenterInWorld() const;
+		void setCameraCenterInWorld(const Vector2 &newPosition);
 
-		const Vector2 cameraToWorld(const Vector2 &screenPosition) const;
-		const Vector2 worldToCamera(const Vector2 &worldPosition) const;
-
-		void update(const float deltaTime);
-		void drawView() const;
+		const Vector2 screenToWorld(const Vector2 &screenPosition) const;
+		const Vector2 worldToScreen(const Vector2 &worldPosition) const;
 
 	private:
 		Camera() = delete;
 
-		// Vector2 position;
-		// Vector2 scale;
-		// Vector2 translation;
-		// Vector2 rotation;
+		Vector2 cameraCenterInWorld;
+		Vector2 scale;
+		float rotation;
 
-		Sidewinder::BoundingBox screenSpace;
-		// std::shared_ptr<Entity> target;
+		Sidewinder::BoundingBox cameraInWorld;
+
+		Matrix getTransformationMatrix() const;
 	};
 }

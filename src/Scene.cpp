@@ -1,20 +1,26 @@
 #include "Scene.hpp"
 
-Scene::Scene() : world(World()), camera(Sidewinder::Camera({{0.f, 0.f}, {1600.f, 1000.f}})) {}
+Scene::Scene() : world(World(3200.f, 2000.f)), camera(Sidewinder::Camera(world))
+{
+}
 
-Scene::~Scene() {}
+Scene::~Scene()
+{
+}
 
 void Scene::update(const float deltaTime)
 {
 	world.update(deltaTime);
-	camera.update(deltaTime);
+	// TODO: move camera position with spring attached to target, target is anchor/fixed
+	std::shared_ptr<SoftBody> &target = world.getEntities().at(0);
+	camera.setCameraCenterInWorld(target->getCenterPosition());
 }
 
 void Scene::draw()
 {
 	for (auto &entity : world.getEntities())
 	{
-		if (camera.getBoundingBox().intersects(entity->getBoundingBox()))
-			entity->draw();
+		// if (camera.getBoundingBox().intersects(entity->getBoundingBox()))
+		entity->draw(camera);
 	}
 }

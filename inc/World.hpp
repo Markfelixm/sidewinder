@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Entity.hpp"
+#include "SoftBody.hpp"
 
 #include "raylib.h"
 
@@ -9,13 +9,19 @@
 class World
 {
 public:
-	World();
+	World(const float width, const float height);
 	~World();
 
-	std::vector<std::shared_ptr<Entity>> &getEntities();
+	std::vector<std::shared_ptr<SoftBody>> &getEntities();
+	const float getWidth() const;
+	const float getHeight() const;
 
 	void update(const float deltaTime);
 
 private:
-	std::vector<std::shared_ptr<Entity>> entities;
+	World() = delete;
+	std::vector<std::shared_ptr<SoftBody>> entities;
+
+	const float width;
+	const float height;
 };

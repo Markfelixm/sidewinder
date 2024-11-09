@@ -1,4 +1,5 @@
 #include "SoftBody.hpp"
+#include "Camera.hpp"
 
 #include "raymath.h"
 
@@ -18,7 +19,7 @@ Vector2 calculateSpringForce(
 	float damping,
 	float stiffness);
 
-SoftBody::SoftBody(std::vector<PointMass> &pointMasses, const float stiffness, const float damping)
+SoftBody::SoftBody(std::vector<PointMass> &pointMasses)
 	: Shape([&pointMasses]()
 			{
 			  std::vector<Vector2> shapeVertices;
@@ -27,8 +28,8 @@ SoftBody::SoftBody(std::vector<PointMass> &pointMasses, const float stiffness, c
 				  shapeVertices.push_back(pointMass.getPosition());
 			  return shapeVertices; }()),
 	  pointMasses(pointMasses),
-	  stiffness(stiffness),
-	  damping(damping),
+	  stiffness(0.3f),
+	  damping(0.1f),
 	  bounds(Sidewinder::BoundingBox(getPointMassPositions())) {}
 
 SoftBody::~SoftBody() {}
@@ -60,6 +61,11 @@ void SoftBody::setStiffness(const float newStiffness)
 void SoftBody::setDamping(const float newDamping)
 {
 	damping = newDamping;
+}
+
+void SoftBody::setColor(const Color &newColor)
+{
+	color = newColor;
 }
 
 const Sidewinder::BoundingBox &SoftBody::getBoundingBox() const
@@ -104,20 +110,27 @@ void SoftBody::satisfyConstraints()
 		pointMass.satisfyConstraints();
 }
 
-void SoftBody::draw(const Color &color, const float thickness) const
+void SoftBody::draw(const Sidewinder::Camera &camera) const
 {
-	Shape::draw(ColorAlpha(ColorContrast(color, -0.5f), 0.4f), thickness * 0.8f);
+	// TODO: determine thickess from camera
+	const float thickness = 5.f;
 
 	if (pointMasses.size() == 0)
 		return;
 	const std::vector<Vector2> vertices = getVertices();
 	for (size_t i = 0; i < vertices.size(); i++)
 	{
-		DrawLineEx(getPointMassPositionAt(i), getPointMassPositionAt((i + 1) % pointMasses.size()), thickness, color);
-		DrawLineEx(getPointMassPositionAt(i), vertices.at(i), thickness, ColorAlpha(color, 0.3f));
-		pointMasses.at(i).draw(color, thickness);
+		// SoftBody
+		// DrawLineEx(getPointMassPositionAt(i), getPointMassPositionAt((i + 1) % pointMasses.size()), thickness, color);
+		// // Shape
+		// DrawLineEx(vertices.at(i), vertices.at((i + 1) % pointMasses.size()), thickness * 0.8f, ColorAlpha(ColorContrast(color, -0.5f), 0.4f));
+		// // spring
+		// DrawLineEx(getPointMassPositionAt(i), vertices.at(i), thickness, ColorAlpha(color, 0.3f));
+		// PointMass
+		// DrawCircleV(getPointMassPositionAt(i), thickness, color);
+		DrawLineEx(camera.worldToScreen(getPointMassPositionAt(i)), camera.worldToScreen(getPointMassPositionAt((i + 1) % pointMasses.size())), thickness, color);
+		DrawCircleV(camera.worldToScreen(getPointMassPositionAt(i)), thickness, color);
 	}
-	DrawLineEx(getPointMassPositionAt(pointMasses.size() - 1), getPointMassPositionAt(0), thickness, color);
 }
 
 void SoftBody::moveCenter(const Vector2 newPosition, const float strength)

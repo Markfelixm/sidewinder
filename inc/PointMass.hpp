@@ -19,7 +19,6 @@ public:
 	void applyAcceleration(const Vector2 &acceleration);
 	virtual void update(const float deltaTime);
 	virtual void satisfyConstraints();
-	virtual void draw(const Color &color, const float radius) const;
 
 protected:
 	Vector2 position;

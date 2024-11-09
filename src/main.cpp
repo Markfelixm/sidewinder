@@ -1,6 +1,4 @@
 #include "raylib.h"
-// #define RAYGUI_IMPLEMENTATION
-// #include "raygui.h"
 
 #if defined(PLATFORM_WEB)
 #include <emscripten/emscripten.h>

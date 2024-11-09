@@ -82,23 +82,7 @@ void Shape::update(const float deltaTime)
 	netAcceleration = {0.f, 0.f};
 }
 
-void Shape::satisfyConstraints()
-{
-}
-
-void Shape::draw(const Color &color, const float thickness) const
-{
-	if (polars.size() == 0)
-		return;
-
-	const std::vector<Vector2> vertices = getVertices();
-	for (size_t i = 0; i < vertices.size(); i++)
-	{
-		DrawLineEx(vertices.at(i), vertices.at((i + 1) % vertices.size()), thickness, color);
-		DrawCircleV(vertices.at(i), thickness, color);
-	}
-	DrawLineEx(vertices.at(vertices.size() - 1), vertices.at(0), thickness, color);
-}
+void Shape::satisfyConstraints() {}
 
 void Shape::updateCenter()
 {

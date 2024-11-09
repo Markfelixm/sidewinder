@@ -58,11 +58,6 @@ void PointMass::update(const float deltaTime)
 	netAcceleration = {0.f, 0.f};
 }
 
-void PointMass::draw(const Color &color, const float radius) const
-{
-	DrawCircleV(position, radius, color);
-}
-
 void PointMass::satisfyConstraints()
 {
 	// position = Vector2Clamp(position, {0.f, 0.f}, {static_cast<float>(GetScreenWidth()), static_cast<float>(GetScreenHeight())});
