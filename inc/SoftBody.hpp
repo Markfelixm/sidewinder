@@ -17,7 +17,7 @@ namespace Sidewinder
 class SoftBody : public Shape
 {
 public:
-	SoftBody(std::vector<PointMass> &pointMasses);
+	SoftBody(const std::vector<PointMass> &pointMasses);
 	~SoftBody();
 
 	const size_t getPointMassCount() const;

@@ -6,7 +6,7 @@
 #include <cmath>
 #include <limits>
 
-// TODO: find bug coupling stiffness, gravity, and velocity
+// TODO: find bug coupling stiffness, gravity, and velocity. probably related to frame and springs
 // TODO: abstract physics and collision utilities
 
 const bool isHorizontalIntersect(const Vector2 &point, const Vector2 &a, const Vector2 &b);
@@ -19,7 +19,7 @@ Vector2 calculateSpringForce(
 	float damping,
 	float stiffness);
 
-SoftBody::SoftBody(std::vector<PointMass> &pointMasses)
+SoftBody::SoftBody(const std::vector<PointMass> &pointMasses)
 	: Shape([&pointMasses]()
 			{
 			  std::vector<Vector2> shapeVertices;

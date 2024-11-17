@@ -19,14 +19,10 @@ struct Input
 
 	void update()
 	{
-		isDown[UP] = IsKeyDown(KEY_W);
-		isDown[UP] = IsKeyDown(KEY_UP);
-		isDown[DOWN] = IsKeyDown(KEY_S);
-		isDown[DOWN] = IsKeyDown(KEY_DOWN);
-		isDown[LEFT] = IsKeyDown(KEY_A);
-		isDown[LEFT] = IsKeyDown(KEY_LEFT);
-		isDown[RIGHT] = IsKeyDown(KEY_D);
-		isDown[RIGHT] = IsKeyDown(KEY_RIGHT);
+		isDown[UP] = IsKeyDown(KEY_W) || IsKeyDown(KEY_UP);
+		isDown[DOWN] = IsKeyDown(KEY_S) || IsKeyDown(KEY_DOWN);
+		isDown[LEFT] = IsKeyDown(KEY_A) || IsKeyDown(KEY_LEFT);
+		isDown[RIGHT] = IsKeyDown(KEY_D) || IsKeyDown(KEY_RIGHT);
 		isDown[JUMP] = IsKeyDown(KEY_SPACE);
 	}
 };

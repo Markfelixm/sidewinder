@@ -1,12 +1,6 @@
 #include "Scene.hpp"
 
-Scene::Scene() : world(World(3200.f, 2000.f)), camera(Sidewinder::Camera(world))
-{
-}
-
-Scene::~Scene()
-{
-}
+Scene::Scene(Input &input) : world(World(input, 3200.f, 2000.f)), camera(Sidewinder::Camera(world)) {}
 
 void Scene::update(const float deltaTime)
 {

@@ -3,11 +3,15 @@
 #include "World.hpp"
 #include "Camera.hpp"
 
+class Input;
+
 class Scene
 {
 public:
-	Scene();
-	~Scene();
+	// TODO: pick a constructor style and apply everywhere
+	Scene() = delete;
+	Scene(Input &input);
+	~Scene() = default;
 
 	void update(const float deltaTime);
 	void draw();

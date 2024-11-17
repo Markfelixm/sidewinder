@@ -1,10 +1,15 @@
 #include "World.hpp"
 
 #include "PointMass.hpp"
+#include "Player.hpp"
 
-World::World(const float width, const float height) : width(width), height(height)
+World::World(Input &input, const float width, const float height) : input(input), width(width), height(height)
 {
-	std::vector<PointMass> trianglePoints = {PointMass({100.f, 100.f}, 100.f), PointMass({50.f, 200.f}, 100.f), PointMass({150.f, 200.f}, 100.f)};
+	Player player = Player(input, {400.f, 400.f}, 12);
+	entities.emplace_back(std::make_shared<Player>(input, Vector2{400.f, 400.f}, 12));
+
+	std::vector<PointMass>
+		trianglePoints = {PointMass({100.f, 100.f}, 100.f), PointMass({50.f, 200.f}, 100.f), PointMass({150.f, 200.f}, 100.f)};
 	std::shared_ptr<SoftBody> triangle = std::make_shared<SoftBody>(trianglePoints);
 	triangle->setColor(BLUE);
 	entities.push_back(triangle);
@@ -42,8 +47,8 @@ const float World::getHeight() const
 
 void World::update(const float deltaTime)
 {
-	static const Vector2 gravity = {0.f, 20.f};
-
+	static const Vector2 gravity = {0.f, 0.f};
+	// TODO: let softbodies be stationary/fixed/static
 	for (auto &entity : entities)
 	{
 		entity->applyAcceleration(gravity);

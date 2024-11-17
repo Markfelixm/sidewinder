@@ -4,7 +4,7 @@
 #include "raygui.h"
 #include "raymath.h"
 
-Game::Game() : viewState(SCENE), scene(Scene()) {}
+Game::Game() : viewState(SCENE), input(Input()), scene(Scene(input)) {}
 
 Game::~Game() {}
 
@@ -22,6 +22,7 @@ void Game::draw()
 
 void Game::update(float deltaTime)
 {
+	input.update();
 	if (viewState == SCENE)
 		scene.update(deltaTime);
 }

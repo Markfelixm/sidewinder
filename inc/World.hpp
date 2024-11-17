@@ -1,15 +1,16 @@
 #pragma once
 
 #include "SoftBody.hpp"
-
 #include "raylib.h"
-
 #include <vector>
+#include <memory>
+
+class Input;
 
 class World
 {
 public:
-	World(const float width, const float height);
+	World(Input &input, const float width, const float height);
 	~World();
 
 	std::vector<std::shared_ptr<SoftBody>> &getEntities();
@@ -20,8 +21,9 @@ public:
 
 private:
 	World() = delete;
-	std::vector<std::shared_ptr<SoftBody>> entities;
 
+	std::vector<std::shared_ptr<SoftBody>> entities;
+	Input &input;
 	const float width;
 	const float height;
 };
