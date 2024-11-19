@@ -16,6 +16,7 @@ namespace Sidewinder
 
 class SoftBody : public Shape
 {
+	// TODO: make abstract
 public:
 	SoftBody(const std::vector<PointMass> &pointMasses);
 	~SoftBody();
@@ -26,6 +27,7 @@ public:
 	void setStiffness(const float newStiffness);
 	void setDamping(const float newDamping);
 	void setColor(const Color &newColor);
+	void setIsStationary(bool state);
 	const Sidewinder::BoundingBox &getBoundingBox() const;
 
 	virtual void applyAcceleration(const Vector2 &acceleration);
@@ -49,6 +51,7 @@ private:
 	float stiffness;
 	float damping;
 
+	bool isStationary;
 	Color color;
 	Sidewinder::BoundingBox bounds;
 };

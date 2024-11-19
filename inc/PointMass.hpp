@@ -2,6 +2,7 @@
 
 #include "raylib.h"
 
+// TODO: turn into struct like in supercell challenge?
 class PointMass
 {
 public:

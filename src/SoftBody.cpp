@@ -30,6 +30,7 @@ SoftBody::SoftBody(const std::vector<PointMass> &pointMasses)
 	  pointMasses(pointMasses),
 	  stiffness(0.3f),
 	  damping(0.1f),
+	  isStationary(false),
 	  bounds(Sidewinder::BoundingBox(getPointMassPositions())) {}
 
 SoftBody::~SoftBody() {}
@@ -68,6 +69,11 @@ void SoftBody::setColor(const Color &newColor)
 	color = newColor;
 }
 
+void SoftBody::setIsStationary(bool state)
+{
+	isStationary = state;
+}
+
 const Sidewinder::BoundingBox &SoftBody::getBoundingBox() const
 {
 	return bounds;
@@ -82,6 +88,8 @@ void SoftBody::applyAcceleration(const Vector2 &acceleration)
 
 void SoftBody::update(const float deltaTime)
 {
+	if (isStationary)
+		return;
 	for (auto &pointMass : pointMasses)
 		pointMass.update(deltaTime);
 	bounds.resize(getPointMassPositions());
