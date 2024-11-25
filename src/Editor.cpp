@@ -83,7 +83,8 @@ void Editor::draw(Sidewinder::Camera &camera)
 
 void Editor::createObstacle()
 {
-	world.addEntity(std::make_shared<Obstacle>(vertices, 10.f));
+	// TODO: add creation options like color, mass, isStationary
+	world.addEntity(std::make_unique<Obstacle>(vertices, 10.f));
 }
 
 bool Editor::isSelfIntersecting(Vector2 &position)

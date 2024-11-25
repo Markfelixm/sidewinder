@@ -5,21 +5,21 @@
 
 World::World(Input &input) : input(input)
 {
-	entities.emplace_back(std::make_shared<Player>(input, Vector2{800.f, 500.f}, 12));
+	entities.emplace_back(std::make_unique<Player>(input, Vector2{800.f, 500.f}, 12));
 
 	std::vector<Vector2>
 		trianglePoints = {{800.f, 100.f}, {850.f, 200.f}, {950.f, 200.f}};
-	entities.push_back(std::make_shared<Obstacle>(trianglePoints, 100.f));
+	entities.push_back(std::make_unique<Obstacle>(trianglePoints, 100.f));
 
 	std::vector<Vector2>
 		squarePoints = {{0.f, 0.f}, {400.f, 0.f}, {400.f, 250.f}, {0.f, 250.f}};
-	entities.push_back(std::make_shared<Obstacle>(squarePoints, 10.f));
+	entities.push_back(std::make_unique<Obstacle>(squarePoints, 10.f));
 	entities.at(2)->setColor(RED);
 	entities.at(2)->setStiffness(0.1f);
 	entities.at(2)->setDamping(0.01f);
 }
 
-std::vector<std::shared_ptr<SoftBody>> &World::getEntities()
+std::vector<std::unique_ptr<SoftBody>> &World::getEntities()
 {
 	return entities;
 }

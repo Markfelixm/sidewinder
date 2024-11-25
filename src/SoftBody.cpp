@@ -179,6 +179,7 @@ bool SoftBody::contains(const Vector2 &point) const
 
 void SoftBody::resolveCollision(PointMass &collider)
 {
+	// TODO: finding nearest edge does not play nice with shapes of greatly varying segment lengths
 	// determine direction and magnitude of collision
 	std::pair<PointMass &, PointMass &> edge = findNearestEdge(collider.getPosition());
 

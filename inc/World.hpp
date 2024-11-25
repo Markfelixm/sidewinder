@@ -14,13 +14,12 @@ public:
 	World(Input &input);
 	~World() = default;
 
-	// TODO: unique ptr
-	std::vector<std::shared_ptr<SoftBody>> &getEntities();
-	void addEntity(std::shared_ptr<SoftBody> pEntity) { entities.push_back(pEntity); }
+	std::vector<std::unique_ptr<SoftBody>> &getEntities();
+	void addEntity(std::unique_ptr<SoftBody> pEntity) { entities.push_back(std::move(pEntity)); }
 
 	void update(const float deltaTime);
 
 private:
-	std::vector<std::shared_ptr<SoftBody>> entities;
+	std::vector<std::unique_ptr<SoftBody>> entities;
 	Input &input;
 };

@@ -9,7 +9,7 @@ void Scene::update(const float deltaTime)
 	else
 		world.update(deltaTime);
 	// TODO: move camera position with spring attached to target, target is anchor/fixed
-	std::shared_ptr<SoftBody> &target = world.getEntities().at(0);
+	std::unique_ptr<SoftBody> &target = world.getEntities().front();
 	camera.setCameraCenterInWorld(target->getCenterPosition());
 }
 
