@@ -10,20 +10,17 @@ class Input;
 class World
 {
 public:
-	World(Input &input, const float width, const float height);
-	~World();
+	World() = delete;
+	World(Input &input);
+	~World() = default;
 
+	// TODO: unique ptr
 	std::vector<std::shared_ptr<SoftBody>> &getEntities();
-	const float getWidth() const;
-	const float getHeight() const;
+	void addEntity(std::shared_ptr<SoftBody> pEntity) { entities.push_back(pEntity); }
 
 	void update(const float deltaTime);
 
 private:
-	World() = delete;
-
 	std::vector<std::shared_ptr<SoftBody>> entities;
 	Input &input;
-	const float width;
-	const float height;
 };

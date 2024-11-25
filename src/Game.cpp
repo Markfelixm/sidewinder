@@ -1,7 +1,5 @@
 #include "Game.hpp"
 
-#define RAYGUI_IMPLEMENTATION
-#include "raygui.h"
 #include "raymath.h"
 
 Game::Game() : viewState(SCENE), input(Input()), scene(Scene(input)) {}

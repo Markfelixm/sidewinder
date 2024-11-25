@@ -18,8 +18,9 @@ class SoftBody : public Shape
 {
 	// TODO: make abstract
 public:
+	SoftBody() = delete;
 	SoftBody(const std::vector<PointMass> &pointMasses);
-	~SoftBody();
+	virtual ~SoftBody() = default;
 
 	const size_t getPointMassCount() const;
 	const Vector2 &getPointMassPositionAt(const size_t index) const;
@@ -42,8 +43,6 @@ public:
 	std::pair<PointMass &, PointMass &> findNearestEdge(const Vector2 &point);
 
 private:
-	SoftBody() = delete;
-
 	void updateCenter();
 	void updateRotation();
 

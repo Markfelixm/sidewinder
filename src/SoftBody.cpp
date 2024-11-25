@@ -31,9 +31,9 @@ SoftBody::SoftBody(const std::vector<PointMass> &pointMasses)
 	  stiffness(0.3f),
 	  damping(0.1f),
 	  isStationary(false),
-	  bounds(Sidewinder::BoundingBox(getPointMassPositions())) {}
-
-SoftBody::~SoftBody() {}
+	  bounds(Sidewinder::BoundingBox(getPointMassPositions()))
+{
+}
 
 const size_t SoftBody::getPointMassCount() const
 {

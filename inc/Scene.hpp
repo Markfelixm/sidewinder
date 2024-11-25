@@ -2,6 +2,7 @@
 
 #include "World.hpp"
 #include "Camera.hpp"
+#include "Editor.hpp"
 
 class Input;
 
@@ -19,4 +20,5 @@ public:
 private:
 	World world;
 	Sidewinder::Camera camera;
+	Editor editor;
 };

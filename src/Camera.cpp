@@ -5,18 +5,12 @@
 namespace Sidewinder
 {
 
+	// TODO: fix GetScreenWidth() and Height()
 	Camera::Camera(const World &world) : cameraInWorld({{0.f, 0.f}, {1600.f, 1000.f}})
 	{
 		cameraCenterInWorld = getCameraCenterInWorld();
-
-		// TODO: fix GetScreenWidth() and Height()
-		float screenWidth = 1600.f;
-		float screenHeight = 1000.f;
-
-		float scaleX = screenWidth / (cameraInWorld.getRight() - cameraInWorld.getLeft());
-		float scaleY = screenHeight / (cameraInWorld.getBottom() - cameraInWorld.getTop());
-		scale = {scaleX, scaleY};
-
+		// TODO: add setScale and fix scaling: maybe recalculate boundingBox around center
+		scale = {1.f, 1.f};
 		rotation = 0.f;
 	}
 
