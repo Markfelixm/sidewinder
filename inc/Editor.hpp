@@ -41,4 +41,5 @@ private:
 	void createObstacle();
 	bool isSelfIntersecting(Vector2 &position);
 	bool isValidPosition(Vector2 &position);
+	void panCamera(Sidewinder::Camera &camera);
 };

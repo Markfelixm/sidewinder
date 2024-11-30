@@ -24,8 +24,8 @@ namespace Sidewinder
 	const Vector2 Camera::getCameraCenterInWorld() const
 	{
 		return {
-			(cameraInWorld.getRight() - cameraInWorld.getLeft()) / 2.f,
-			(cameraInWorld.getBottom() - cameraInWorld.getTop()) / 2.f};
+			cameraInWorld.getLeft() + (cameraInWorld.getRight() - cameraInWorld.getLeft()) / 2.f,
+			cameraInWorld.getTop() + (cameraInWorld.getBottom() - cameraInWorld.getTop()) / 2.f};
 	}
 
 	void Camera::setCameraCenterInWorld(const Vector2 &newPositon)

@@ -21,6 +21,8 @@ void Editor::update(Sidewinder::Camera &camera)
 {
 	if (isEnabled && CheckCollisionPointRec(GetMousePosition(), (Rectangle){20.f, 20.f, 200.f, 800.f}))
 		return;
+
+	panCamera(camera);
 	Vector2 mouseInWorld = camera.screenToWorld(GetMousePosition());
 
 	creator.isClosable = (creator.vertices.size() > 2 && circleContains(creator.vertices.front(), validRadius, mouseInWorld));
@@ -52,11 +54,13 @@ void Editor::draw(Sidewinder::Camera &camera)
 	// gui
 	if (!isEnabled)
 	{
+		DrawRectangleRec((Rectangle){20.f, 20.f, 200.f, 50.f}, ColorAlpha(RAYWHITE, 0.67f));
 		GuiGroupBox((Rectangle){20.f, 20.f, 200.f, 50.f}, "Editor");
 		if (GuiButton((Rectangle){25.f, 25.f, 190.f, 40.f}, "Enable"))
 			isEnabled = true;
 		return;
 	}
+	DrawRectangleRec((Rectangle){20.f, 20.f, 200.f, 500.f}, ColorAlpha(RAYWHITE, 0.67f));
 	GuiGroupBox((Rectangle){20.f, 20.f, 200.f, 500.f}, "Editor");
 	if (GuiButton((Rectangle){25.f, 25.f, 190.f, 40.f}, "Disable"))
 	{
@@ -139,6 +143,26 @@ bool Editor::isValidPosition(Vector2 &position)
 	// TODO: add minimum angle between lines threshold to avoid colinears
 	// TODO: check against existing entities, check bounding box first
 	return !isSelfIntersecting(position);
+}
+
+void Editor::panCamera(Sidewinder::Camera &camera)
+{
+	static bool isPanning = false;
+	static Vector2 initialPosition = {0.f, 0.f};
+	static Vector2 initialCameraCenter = {0.f, 0.f};
+	if (IsMouseButtonPressed(MOUSE_BUTTON_RIGHT))
+	{
+		initialPosition = GetMousePosition();
+		initialCameraCenter = camera.getCameraCenterInWorld();
+		isPanning = true;
+	}
+	if (IsMouseButtonReleased(MOUSE_BUTTON_RIGHT))
+		isPanning = false;
+	if (isPanning)
+	{
+		Vector2 displacement = Vector2Subtract(GetMousePosition(), initialPosition);
+		camera.setCameraCenterInWorld(Vector2Add(initialCameraCenter, Vector2Scale(displacement, -1.f)));
+	}
 }
 
 bool circleContains(Vector2 &circlePositon, float circleRadius, Vector2 &position)

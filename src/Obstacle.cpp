@@ -14,10 +14,12 @@ Obstacle::Obstacle(const std::vector<Vector2> &vertices, const float mass) : Sof
 
 void Obstacle::applyAcceleration(const Vector2 &acceleration)
 {
+	SoftBody::applyAcceleration(acceleration);
 }
 
 void Obstacle::update(const float deltaTime)
 {
+	SoftBody::update(deltaTime);
 }
 
 void Obstacle::satisfyConstraints()
