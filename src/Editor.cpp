@@ -10,91 +10,119 @@ bool circleContains(Vector2 &circlePositon, float circleRadius, Vector2 &positio
 bool isClockwise(const Vector2 &a, const Vector2 &b, const Vector2 &position);
 bool segmentsIntersect(const Vector2 &a, const Vector2 &b, const Vector2 &c, const Vector2 &d);
 
-Editor::Editor(World &world, const Vector2 &topLeft) : world(world), topLeft(topLeft), isEnabled(false), isClosable(false), isRemovable(false), isPlacable(true)
+Editor::Editor(World &world) : world(world),
+							   isEnabled(false),
+							   creator({{}, 1.f, 0.1f, 0.1f, false, BLUE, false, false, true})
+
 {
 }
 
 void Editor::update(Sidewinder::Camera &camera)
 {
+	if (isEnabled && CheckCollisionPointRec(GetMousePosition(), (Rectangle){20.f, 20.f, 200.f, 800.f}))
+		return;
 	Vector2 mouseInWorld = camera.screenToWorld(GetMousePosition());
 
-	isClosable = (vertices.size() > 2 && circleContains(vertices.front(), validRadius, mouseInWorld));
+	creator.isClosable = (creator.vertices.size() > 2 && circleContains(creator.vertices.front(), validRadius, mouseInWorld));
 	// TODO: fix: cant close when last segment would make concave shape
-	// isClosable = isClosable && !isSelfIntersecting(vertices.front());
-	isRemovable = (!vertices.empty() && circleContains(vertices.back(), validRadius, mouseInWorld));
-	isPlacable = isValidPosition(mouseInWorld);
+	// creator.isClosable = creator.isClosable && !isSelfIntersecting(creator.vertices.front());
+	creator.isRemovable = (!creator.vertices.empty() && circleContains(creator.vertices.back(), validRadius, mouseInWorld));
+	creator.isPlacable = isValidPosition(mouseInWorld);
+	bool isWithinEditorWindow = false;
 
 	if (IsMouseButtonPressed(MOUSE_BUTTON_LEFT))
 	{
-		if (isClosable)
+		if (creator.isClosable)
 		{
 			createObstacle();
-			vertices.clear();
+			creator.vertices.clear();
 		}
-		else if (isRemovable)
+		else if (creator.isRemovable)
 		{
-			vertices.pop_back();
-			isRemovable = false;
+			creator.vertices.pop_back();
+			creator.isRemovable = false;
 		}
-		else if (isPlacable)
-			vertices.push_back(mouseInWorld);
+		else if (creator.isPlacable)
+			creator.vertices.push_back(mouseInWorld);
 	}
 }
 
 void Editor::draw(Sidewinder::Camera &camera)
 {
+	// gui
 	if (!isEnabled)
 	{
-		if (GuiButton((Rectangle){topLeft.x, topLeft.y, topLeft.x + width, topLeft.y + yOffset}, "Enable Editor"))
+		GuiGroupBox((Rectangle){20.f, 20.f, 200.f, 50.f}, "Editor");
+		if (GuiButton((Rectangle){25.f, 25.f, 190.f, 40.f}, "Enable"))
 			isEnabled = true;
 		return;
 	}
-	if (GuiButton((Rectangle){topLeft.x, topLeft.y, topLeft.x + width, topLeft.y + yOffset}, "Disable Editor"))
+	GuiGroupBox((Rectangle){20.f, 20.f, 200.f, 500.f}, "Editor");
+	if (GuiButton((Rectangle){25.f, 25.f, 190.f, 40.f}, "Disable"))
 	{
-		vertices.clear();
+		creator.vertices.clear();
 		isEnabled = false;
 		return;
 	}
-	if (!vertices.empty())
+	GuiGroupBox((Rectangle){25.f, 80.f, 190.f, 50.f}, "World");
+	GuiSlider((Rectangle){70.f, 85.f, 100.f, 40.f}, "gravity", TextFormat("%.1f", *world.getPGravity()), world.getPGravity(), 0.f, 3000.f);
+
+	GuiGroupBox((Rectangle){25.f, 140.f, 190.f, 290.f}, "Obstacle");
+	GuiSlider((Rectangle){70.f, 145.f, 100.f, 40.f}, "mass", TextFormat("%.1f", creator.mass), &creator.mass, 0.1f, 1000.f);
+	GuiSlider((Rectangle){70.f, 190.f, 100.f, 40.f}, "stiff", TextFormat("%.2f", creator.stiffness), &creator.stiffness, 0.01f, 1.f);
+	GuiSlider((Rectangle){70.f, 235.f, 100.f, 40.f}, "damping", TextFormat("%.2f", creator.damping), &creator.damping, 0.01f, 1.f);
+	GuiCheckBox((Rectangle){70.f, 280.f, 40.f, 40.f}, "stationary", &creator.isStationary);
+	GuiColorPicker((Rectangle){30.f, 325.f, 100.f, 100.f}, nullptr, &creator.color);
+	DrawRectangle(170, 325, 30, 100, creator.color);
+
+	// obstacle vertices
+	if (!creator.vertices.empty())
 	{
-		if (isClosable)
-			DrawCircleV(camera.worldToScreen(vertices.front()), validRadius, GREEN);
-		DrawCircleLinesV(camera.worldToScreen(vertices.front()), validRadius, BLACK);
-		DrawCircleV(camera.worldToScreen(vertices.front()), 4.f, BLACK);
-		if (isRemovable)
-			DrawCircleV(camera.worldToScreen(vertices.back()), validRadius, BLACK);
-		if (!isPlacable && !isClosable && !isRemovable)
-			DrawLineEx(camera.worldToScreen(vertices.back()), GetMousePosition(), 8.f, RED);
-		if (isClosable) // snap to closable
-			DrawLineV(camera.worldToScreen(vertices.back()), camera.worldToScreen(vertices.front()), BLACK);
+		if (creator.isClosable)
+			DrawCircleV(camera.worldToScreen(creator.vertices.front()), validRadius, GREEN);
+		DrawCircleLinesV(camera.worldToScreen(creator.vertices.front()), validRadius, BLACK);
+		DrawCircleV(camera.worldToScreen(creator.vertices.front()), 4.f, BLACK);
+		if (creator.isRemovable)
+			DrawCircleV(camera.worldToScreen(creator.vertices.back()), validRadius, BLACK);
+		if (!creator.isPlacable && !creator.isClosable && !creator.isRemovable)
+			DrawLineEx(camera.worldToScreen(creator.vertices.back()), GetMousePosition(), 8.f, RED);
+		if (creator.isClosable) // snap to closable
+			DrawLineV(camera.worldToScreen(creator.vertices.back()), camera.worldToScreen(creator.vertices.front()), BLACK);
 		else
 		{
 			DrawCircleV(GetMousePosition(), 4.f, BLACK);
-			DrawLineV(camera.worldToScreen(vertices.back()), GetMousePosition(), BLACK);
+			DrawLineV(camera.worldToScreen(creator.vertices.back()), GetMousePosition(), BLACK);
 		}
 	}
-	for (size_t i = 1; i < vertices.size(); i++)
+	for (size_t i = 1; i < creator.vertices.size(); i++)
 	{
-		DrawCircleV(camera.worldToScreen(vertices.at(i)), 4.f, BLACK);
-		DrawCircleLinesV(camera.worldToScreen(vertices.at(i)), validRadius, BLACK);
-		DrawLineV(camera.worldToScreen(vertices.at(i - 1)), camera.worldToScreen(vertices.at(i)), BLACK);
+		DrawCircleV(camera.worldToScreen(creator.vertices.at(i)), 4.f, BLACK);
+		DrawCircleLinesV(camera.worldToScreen(creator.vertices.at(i)), validRadius, BLACK);
+		DrawLineV(camera.worldToScreen(creator.vertices.at(i - 1)), camera.worldToScreen(creator.vertices.at(i)), BLACK);
 	}
 }
 
 void Editor::createObstacle()
 {
 	// TODO: add creation options like color, mass, isStationary
-	world.addEntity(std::make_unique<Obstacle>(vertices, 10.f));
+
+	std::unique_ptr<SoftBody> pObstacle = std::make_unique<Obstacle>(creator.vertices, creator.mass);
+	pObstacle->setStiffness(creator.stiffness);
+	pObstacle->setDamping(creator.damping);
+	pObstacle->setIsStationary(creator.isStationary);
+	pObstacle->setColor(creator.color);
+
+	world.addEntity(std::move(pObstacle));
 }
 
 bool Editor::isSelfIntersecting(Vector2 &position)
 {
-	for (size_t i = 1; vertices.size() > 2 && i < (vertices.size() - 1); i++)
+	for (size_t i = 1; creator.vertices.size() > 2 && i < (creator.vertices.size() - 1); i++)
 	{
 		if (segmentsIntersect(
-				vertices.at(i - 1),
-				vertices.at(i),
-				vertices.back(),
+				creator.vertices.at(i - 1),
+				creator.vertices.at(i),
+				creator.vertices.back(),
 				position))
 			return true;
 	}
@@ -103,7 +131,7 @@ bool Editor::isSelfIntersecting(Vector2 &position)
 
 bool Editor::isValidPosition(Vector2 &position)
 {
-	for (auto &vertex : vertices)
+	for (auto &vertex : creator.vertices)
 	{
 		if (circleContains(vertex, validRadius, position))
 			return false;

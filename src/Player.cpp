@@ -1,6 +1,5 @@
 #include "Player.hpp"
 #include "PointMass.hpp"
-#include "Input.hpp"
 #include "raymath.h"
 #include <vector>
 #include <cmath>

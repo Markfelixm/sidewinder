@@ -3,7 +3,7 @@
 #include "Player.hpp"
 #include "Obstacle.hpp"
 
-World::World(Input &input) : input(input)
+World::World(Input &input) : input(input), gravity(0.f)
 {
 	entities.emplace_back(std::make_unique<Player>(input, Vector2{800.f, 500.f}, 12));
 
@@ -26,7 +26,6 @@ std::vector<std::unique_ptr<SoftBody>> &World::getEntities()
 
 void World::update(const float deltaTime)
 {
-	static const Vector2 gravity = {0.f, 0.f};
 	// TODO: let softbodies be stationary/fixed/static
 
 	for (auto &entity : entities)
@@ -35,7 +34,7 @@ void World::update(const float deltaTime)
 		// {
 		// handle player
 		// }
-		entity->applyAcceleration(gravity);
+		entity->applyAcceleration({0.f, gravity});
 		entity->update(deltaTime);
 		for (auto &other : entities)
 			entity->handleSoftBodyCollision(*other.get());

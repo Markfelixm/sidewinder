@@ -42,15 +42,16 @@ public:
 	void resolveCollision(PointMass &collider);
 	std::pair<PointMass &, PointMass &> findNearestEdge(const Vector2 &point);
 
+protected:
+	float stiffness;
+	float damping;
+	bool isStationary;
+	Color color;
+
 private:
 	void updateCenter();
 	void updateRotation();
 
 	std::vector<PointMass> pointMasses;
-	float stiffness;
-	float damping;
-
-	bool isStationary;
-	Color color;
 	Sidewinder::BoundingBox bounds;
 };

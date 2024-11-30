@@ -1,6 +1,6 @@
 #include "Scene.hpp"
 
-Scene::Scene(Input &input) : world(World(input)), camera(Sidewinder::Camera(world)), editor(Editor(world, {20.f, 20.f})) {}
+Scene::Scene(Input &input) : world(World(input)), camera(Sidewinder::Camera(world)), editor(Editor(world)) {}
 
 void Scene::update(const float deltaTime)
 {

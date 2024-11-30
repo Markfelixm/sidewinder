@@ -6,10 +6,23 @@
 #include <vector>
 #include <map>
 
+struct Creator
+{
+	std::vector<Vector2> vertices;
+	float mass;
+	float stiffness;
+	float damping;
+	bool isStationary;
+	Color color;
+	bool isClosable;
+	bool isRemovable;
+	bool isPlacable;
+};
+
 class Editor
 {
 public:
-	Editor(World &world, const Vector2 &topLeft);
+	Editor(World &world);
 	~Editor() = default;
 
 	bool getIsEnabled() const { return isEnabled; }
@@ -18,18 +31,12 @@ public:
 	void draw(Sidewinder::Camera &camera);
 
 private:
-	static constexpr float width = 100.f;
-	static constexpr float yOffset = 30.f;
-	// static constexpr float yGap = 2.f;
-	static constexpr float validRadius = 20.f;
-
 	World &world;
-	Vector2 topLeft;
+
+	static constexpr float validRadius = 20.f;
 	bool isEnabled;
-	bool isClosable;
-	bool isRemovable;
-	bool isPlacable;
-	std::vector<Vector2> vertices;
+
+	Creator creator;
 
 	void createObstacle();
 	bool isSelfIntersecting(Vector2 &position);

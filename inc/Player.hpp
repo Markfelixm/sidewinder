@@ -1,12 +1,8 @@
 #pragma once
 
 #include "SoftBody.hpp"
-
-class Input;
-namespace Sidewinder
-{
-	class Camera;
-}
+#include "Camera.hpp"
+#include "Input.hpp"
 
 class Player : public SoftBody
 {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "SoftBody.hpp"
+#include "Camera.hpp"
 #include "raylib.h"
 #include <vector>
 
