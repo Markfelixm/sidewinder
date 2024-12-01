@@ -3,7 +3,7 @@
 #include "Player.hpp"
 #include "Obstacle.hpp"
 
-World::World(Input &input) : input(input), gravity(500.f)
+World::World(Input &input) : input(input), gravity(500.f), playerFeelsGravity(true)
 {
 	entities.emplace_back(std::make_unique<Player>(input, Vector2{800.f, 500.f}, 10));
 
@@ -36,11 +36,9 @@ void World::update(const float deltaTime)
 {
 	for (auto &entity : entities)
 	{
-		// if (auto player = std::dynamic_pointer_cast<Player>(entity))
-		// {
-		// 	// handle player
-		// }
-		entity->applyAcceleration({0.f, gravity});
+		if (!(dynamic_cast<Player *>(entity.get()) && !playerFeelsGravity))
+			entity->applyAcceleration({0.f, gravity});
+
 		entity->update(deltaTime);
 		for (auto &other : entities)
 			entity->handleSoftBodyCollision(*other.get());

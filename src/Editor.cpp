@@ -19,7 +19,7 @@ Editor::Editor(World &world) : world(world),
 
 void Editor::update(Sidewinder::Camera &camera)
 {
-	if (isEnabled && CheckCollisionPointRec(GetMousePosition(), (Rectangle){20.f, 20.f, 200.f, 415.f}))
+	if (isEnabled && CheckCollisionPointRec(GetMousePosition(), (Rectangle){20.f, 20.f, 200.f, 465.f}))
 		return;
 
 	panCamera(camera);
@@ -60,24 +60,25 @@ void Editor::draw(Sidewinder::Camera &camera)
 			isEnabled = true;
 		return;
 	}
-	DrawRectangleRec((Rectangle){20.f, 20.f, 200.f, 415.f}, ColorAlpha(RAYWHITE, 0.67f));
-	GuiGroupBox((Rectangle){20.f, 20.f, 200.f, 415.f}, "Editor");
+	DrawRectangleRec((Rectangle){20.f, 20.f, 200.f, 465.f}, ColorAlpha(RAYWHITE, 0.67f));
+	GuiGroupBox((Rectangle){20.f, 20.f, 200.f, 465.f}, "Editor");
 	if (GuiButton((Rectangle){25.f, 25.f, 190.f, 40.f}, "Disable"))
 	{
 		creator.vertices.clear();
 		isEnabled = false;
 		return;
 	}
-	GuiGroupBox((Rectangle){25.f, 80.f, 190.f, 50.f}, "World");
+	GuiGroupBox((Rectangle){25.f, 80.f, 190.f, 95.f}, "World");
 	GuiSlider((Rectangle){70.f, 85.f, 100.f, 40.f}, "gravity", TextFormat("%.1f", *world.getPGravity()), world.getPGravity(), 0.f, 3000.f);
+	GuiCheckBox((Rectangle){70.f, 130.f, 40.f, 40.f}, "player gravity", world.getPPlayerFeelsGravity());
 
-	GuiGroupBox((Rectangle){25.f, 140.f, 190.f, 290.f}, "Obstacle");
-	GuiSlider((Rectangle){70.f, 145.f, 100.f, 40.f}, "mass", TextFormat("%.1f", creator.mass), &creator.mass, 0.1f, 1000.f);
-	GuiSlider((Rectangle){70.f, 190.f, 100.f, 40.f}, "stiff", TextFormat("%.2f", creator.stiffness), &creator.stiffness, 0.01f, 1.f);
-	GuiSlider((Rectangle){70.f, 235.f, 100.f, 40.f}, "damping", TextFormat("%.3f", creator.damping), &creator.damping, 0.001f, 0.1f);
-	GuiCheckBox((Rectangle){70.f, 280.f, 40.f, 40.f}, "stationary", &creator.isStationary);
-	GuiColorPicker((Rectangle){30.f, 325.f, 100.f, 100.f}, nullptr, &creator.color);
-	DrawRectangle(170, 325, 30, 100, creator.color);
+	GuiGroupBox((Rectangle){25.f, 185.f, 190.f, 290.f}, "Obstacle");
+	GuiSlider((Rectangle){70.f, 190.f, 100.f, 40.f}, "mass", TextFormat("%.1f", creator.mass), &creator.mass, 0.1f, 1000.f);
+	GuiSlider((Rectangle){70.f, 235.f, 100.f, 40.f}, "stiff", TextFormat("%.2f", creator.stiffness), &creator.stiffness, 0.01f, 1.f);
+	GuiSlider((Rectangle){70.f, 280.f, 100.f, 40.f}, "damping", TextFormat("%.3f", creator.damping), &creator.damping, 0.001f, 0.1f);
+	GuiCheckBox((Rectangle){70.f, 325.f, 40.f, 40.f}, "stationary", &creator.isStationary);
+	GuiColorPicker((Rectangle){30.f, 370.f, 100.f, 100.f}, nullptr, &creator.color);
+	DrawRectangle(170, 370, 30, 100, creator.color);
 
 	// obstacle vertices
 	if (!creator.vertices.empty())

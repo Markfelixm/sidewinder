@@ -15,6 +15,7 @@ public:
 	~World() = default;
 
 	float *getPGravity() { return &gravity; }
+	bool *getPPlayerFeelsGravity() { return &playerFeelsGravity; }
 	std::vector<std::unique_ptr<SoftBody>> &getEntities();
 	void addEntity(std::unique_ptr<SoftBody> pEntity) { entities.push_back(std::move(pEntity)); }
 
@@ -25,4 +26,5 @@ private:
 	Input &input;
 
 	float gravity;
+	bool playerFeelsGravity;
 };
