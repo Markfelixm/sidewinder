@@ -21,7 +21,7 @@ std::vector<PointMass> createCircularPointMasses(const Vector2 &center, const si
 Player::Player(Input &input, const Vector2 &position, const size_t pointCount)
 	: SoftBody(createCircularPointMasses(position, pointCount, RADIUS, MASS)), input(input)
 {
-	setColor(GREEN);
+	setColor((Color){42, 142, 123, 255});
 	setStiffness(STIFFNESS);
 	setDamping(DAMPING);
 }

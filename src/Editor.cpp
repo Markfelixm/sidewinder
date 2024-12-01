@@ -12,7 +12,7 @@ bool segmentsIntersect(const Vector2 &a, const Vector2 &b, const Vector2 &c, con
 
 Editor::Editor(World &world) : world(world),
 							   isEnabled(false),
-							   creator({{}, 1.f, 0.1f, 0.1f, false, BLUE, false, false, true})
+							   creator({{}, 100.f, 0.1f, 0.1f, true, BLUE, false, false, true})
 
 {
 }
@@ -69,7 +69,7 @@ void Editor::draw(Sidewinder::Camera &camera)
 		return;
 	}
 	GuiGroupBox((Rectangle){25.f, 80.f, 190.f, 95.f}, "World");
-	GuiSlider((Rectangle){70.f, 85.f, 100.f, 40.f}, "gravity", TextFormat("%.1f", *world.getPGravity()), world.getPGravity(), 0.f, 3000.f);
+	GuiSlider((Rectangle){70.f, 85.f, 100.f, 40.f}, "gravity", TextFormat("%.1f", *world.getPGravity()), world.getPGravity(), 0.f, 2000.f);
 	GuiCheckBox((Rectangle){70.f, 130.f, 40.f, 40.f}, "player gravity", world.getPPlayerFeelsGravity());
 
 	GuiGroupBox((Rectangle){25.f, 185.f, 190.f, 290.f}, "Obstacle");

@@ -12,7 +12,7 @@ class World
 public:
 	World() = delete;
 	World(Input &input);
-	~World() = default;
+	~World();
 
 	float *getPGravity() { return &gravity; }
 	bool *getPPlayerFeelsGravity() { return &playerFeelsGravity; }

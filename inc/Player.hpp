@@ -11,7 +11,7 @@ public:
 	static constexpr float MASS = 100.f;
 	static constexpr float STIFFNESS = 0.2f;
 	static constexpr float DAMPING = 0.01f;
-	static constexpr float SPEED = 1000.f;
+	static constexpr float SPEED = 800.f;
 
 	Player(Input &input, const Vector2 &position, const size_t pointCount);
 	~Player() = default;
