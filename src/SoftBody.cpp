@@ -131,7 +131,7 @@ void SoftBody::draw(const Sidewinder::Camera &camera) const
 		// SoftBody
 		// DrawLineEx(getPointMassPositionAt(i), getPointMassPositionAt((i + 1) % pointMasses.size()), thickness, color);
 		// // Shape
-		// DrawLineEx(vertices.at(i), vertices.at((i + 1) % pointMasses.size()), thickness * 0.8f, ColorAlpha(ColorContrast(color, -0.5f), 0.4f));
+		DrawLineEx(camera.worldToScreen(vertices.at(i)), camera.worldToScreen(vertices.at((i + 1) % pointMasses.size())), thickness * 0.8f, ColorAlpha(ColorContrast(color, -0.5f), 0.3f));
 		// // spring
 		// DrawLineEx(getPointMassPositionAt(i), vertices.at(i), thickness, ColorAlpha(color, 0.3f));
 		// PointMass

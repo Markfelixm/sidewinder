@@ -9,13 +9,13 @@ World::World(Input &input) : input(input), gravity(500.f)
 
 	std::vector<Vector2>
 		leftPoints = {{100.f, 100.f}, {200.f, 100.f}, {200.f, 200.f}, {100.f, 200.f}};
-	entities.push_back(std::make_unique<Obstacle>(leftPoints, 10.f));
+	entities.push_back(std::make_unique<Obstacle>(leftPoints, 200.f));
 	entities.at(1)->setColor((Color){0, 0, 242, 255});
 	entities.at(1)->setStiffness(0.1f);
 
 	std::vector<Vector2>
 		rightPoints = {{300.f, 100.f}, {400.f, 100.f}, {400.f, 300.f}, {300.f, 300.f}};
-	entities.push_back(std::make_unique<Obstacle>(rightPoints, 10.f));
+	entities.push_back(std::make_unique<Obstacle>(rightPoints, 200.f));
 	entities.at(2)->setColor((Color){242, 0, 0, 255});
 	entities.at(2)->setStiffness(0.3f);
 
