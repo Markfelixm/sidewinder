@@ -8,10 +8,10 @@ class Player : public SoftBody
 {
 public:
 	static constexpr float RADIUS = 50.f;
-	static constexpr float MASS = 10.f;
+	static constexpr float MASS = 100.f;
 	static constexpr float STIFFNESS = 0.2f;
-	static constexpr float DAMPING = 0.2f;
-	static constexpr float SPEED = 2000.f;
+	static constexpr float DAMPING = 0.01f;
+	static constexpr float SPEED = 1000.f;
 
 	Player(Input &input, const Vector2 &position, const size_t pointCount);
 	~Player() = default;

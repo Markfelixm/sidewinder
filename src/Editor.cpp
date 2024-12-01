@@ -74,7 +74,7 @@ void Editor::draw(Sidewinder::Camera &camera)
 	GuiGroupBox((Rectangle){25.f, 140.f, 190.f, 290.f}, "Obstacle");
 	GuiSlider((Rectangle){70.f, 145.f, 100.f, 40.f}, "mass", TextFormat("%.1f", creator.mass), &creator.mass, 0.1f, 1000.f);
 	GuiSlider((Rectangle){70.f, 190.f, 100.f, 40.f}, "stiff", TextFormat("%.2f", creator.stiffness), &creator.stiffness, 0.01f, 1.f);
-	GuiSlider((Rectangle){70.f, 235.f, 100.f, 40.f}, "damping", TextFormat("%.2f", creator.damping), &creator.damping, 0.01f, 1.f);
+	GuiSlider((Rectangle){70.f, 235.f, 100.f, 40.f}, "damping", TextFormat("%.6f", creator.damping), &creator.damping, 0.001f, 0.1f);
 	GuiCheckBox((Rectangle){70.f, 280.f, 40.f, 40.f}, "stationary", &creator.isStationary);
 	GuiColorPicker((Rectangle){30.f, 325.f, 100.f, 100.f}, nullptr, &creator.color);
 	DrawRectangle(170, 325, 30, 100, creator.color);

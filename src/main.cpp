@@ -34,5 +34,6 @@ int main()
 void UpdateDrawFrame()
 {
 	game.update(GetFrameTime());
+	// game.update(1.f / 60.f); // for debugger
 	game.draw();
 }

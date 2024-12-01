@@ -6,7 +6,7 @@
 #include <cmath>
 #include <limits>
 
-// TODO: find bug coupling stiffness, gravity, and velocity. probably related to frame and springs
+// TODO: find bug coupling damping, gravity, and velocity. probably related to frame and springs
 // TODO: abstract physics and collision utilities
 
 const bool isHorizontalIntersect(const Vector2 &point, const Vector2 &a, const Vector2 &b);
@@ -16,8 +16,8 @@ Vector2 calculateSpringForce(
 	const Vector2 &currentPosition,
 	const Vector2 &targetPosition,
 	const Vector2 &currentVelocity,
-	float damping,
-	float stiffness);
+	float stiffness,
+	float damping);
 
 SoftBody::SoftBody(const std::vector<PointMass> &pointMasses)
 	: Shape([&pointMasses]()
@@ -28,8 +28,8 @@ SoftBody::SoftBody(const std::vector<PointMass> &pointMasses)
 				  shapeVertices.push_back(pointMass.getPosition());
 			  return shapeVertices; }()),
 	  pointMasses(pointMasses),
-	  stiffness(0.3f),
-	  damping(0.1f),
+	  stiffness(0.1f),
+	  damping(0.05f),
 	  isStationary(false),
 	  bounds(Sidewinder::BoundingBox(getPointMassPositions()))
 {
@@ -137,10 +137,11 @@ void SoftBody::draw(const Sidewinder::Camera &camera) const
 		// PointMass
 		// DrawCircleV(getPointMassPositionAt(i), thickness, color);
 		DrawLineEx(camera.worldToScreen(getPointMassPositionAt(i)), camera.worldToScreen(getPointMassPositionAt((i + 1) % pointMasses.size())), thickness, color);
-		DrawCircleV(camera.worldToScreen(getPointMassPositionAt(i)), thickness, color);
+		DrawCircleV(camera.worldToScreen(getPointMassPositionAt(i)), thickness * 0.67f, color);
 	}
 }
 
+// TODO: rm?
 void SoftBody::moveCenter(const Vector2 newPosition, const float strength)
 {
 	Vector2 displacement = Vector2Subtract(newPosition, center);
@@ -204,8 +205,6 @@ void SoftBody::resolveCollision(PointMass &collider)
 	edge.first.setPosition(Vector2Add(edge.first.getPosition(), Vector2Scale(collisionNormal, -1.f * edgeResolutionDistance)));
 	edge.second.setPosition(Vector2Add(edge.second.getPosition(), Vector2Scale(collisionNormal, -1.f * edgeResolutionDistance)));
 	collider.setPosition(Vector2Add(collider.getPosition(), Vector2Scale(collisionNormal, colliderResolutionDistance)));
-
-	// TODO: maybe apply elastic collision velocities. verlet integration with springs already seems to make for inelastic looking collisions
 }
 
 std::pair<PointMass &, PointMass &> SoftBody::findNearestEdge(const Vector2 &point)
@@ -303,8 +302,8 @@ Vector2 calculateSpringForce(
 	const Vector2 &currentPosition,
 	const Vector2 &targetPosition,
 	const Vector2 &currentVelocity,
-	float damping,
-	float stiffness)
+	float stiffness,
+	float damping)
 {
 	// simple damped harmonic motion
 	// F = -stiffness * displacement - damping * velocity
