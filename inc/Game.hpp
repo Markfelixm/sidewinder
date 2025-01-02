@@ -1,8 +1,12 @@
 #pragma once
 
-#include "Input.hpp"
-#include "Scene.hpp"
+// #include "Input.hpp"
+// #include "Scene.hpp"
 #include "raylib.h"
+
+#include "SpringBox.hpp"
+#include "Shape.hpp"
+#include <memory>
 
 class Game
 {
@@ -15,15 +19,18 @@ class Game
 
 public:
 	Game();
-	~Game();
+	~Game() = default;
 
 	void draw();
 	void update(float deltaTime);
 
 private:
-	Input input;
-	ViewState viewState;
+	// Input input;
+	// ViewState viewState;
 	// Title title;
-	Scene scene;
+	// Scene scene;
 	// Retry retry;
+
+	std::unique_ptr<SpringBox> box;
+	std::unique_ptr<Shape> shape;
 };

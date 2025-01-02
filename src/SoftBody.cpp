@@ -139,6 +139,9 @@ void SoftBody::draw(const Sidewinder::Camera &camera) const
 		DrawLineEx(camera.worldToScreen(getPointMassPositionAt(i)), camera.worldToScreen(getPointMassPositionAt((i + 1) % pointMasses.size())), thickness, color);
 		DrawCircleV(camera.worldToScreen(getPointMassPositionAt(i)), thickness * 0.67f, color);
 	}
+	// debug
+	DrawCircleV(camera.worldToScreen({bounds.getLeft(), bounds.getTop()}), 20.f, RED);
+	DrawCircleV(camera.worldToScreen({bounds.getRight(), bounds.getBottom()}), 20.f, YELLOW);
 }
 
 // TODO: rm?

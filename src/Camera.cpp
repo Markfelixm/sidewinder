@@ -1,5 +1,4 @@
 #include "Camera.hpp"
-
 #include "raymath.h"
 
 namespace Sidewinder

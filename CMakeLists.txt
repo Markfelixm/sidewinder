@@ -33,8 +33,13 @@ endif()
 
 # Project
 file(GLOB_RECURSE SOURCES
-src/*.cpp
-inc/*.hpp
+# src/*.cpp
+# inc/*.hpp
+src/main.cpp
+src/Game.cpp
+inc/PointMass.hpp
+inc/Spring.hpp
+inc/SpringBox.hpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

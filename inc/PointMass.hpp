@@ -1,33 +1,49 @@
 #pragma once
 
 #include "raylib.h"
+#include "raymath.h"
 
-// TODO: turn into struct like in supercell challenge?
-class PointMass
+struct PointMass
 {
-public:
-	PointMass(const Vector2 &initialPosition, const float mass);
-	~PointMass();
 
-	void setMass(const float newMass);
-	const float getMass() const;
-	const float getInverseMass() const;
-	void setPosition(const Vector2 &newPosition);
-	const Vector2 &getPosition() const;
-	const Vector2 &getAcceleration() const;
-
-	const Vector2 determineVelocity() const;
-	void applyAcceleration(const Vector2 &acceleration);
-	virtual void update(const float deltaTime);
-	virtual void satisfyConstraints();
-
-protected:
 	Vector2 position;
 	Vector2 previousPosition;
-	Vector2 netAcceleration;
+	Vector2 acceleration;
 	float mass;
-	float inverseMass;
+	float friction;
 
-private:
-	PointMass() = delete;
+	PointMass(const Vector2 &initialPosition, float mass) : position(initialPosition), previousPosition(initialPosition), acceleration({0.f, 0.f}), mass(mass), friction(0.01f) {}
+
+	Vector2 getVelocity()
+	{
+		Vector2 velocity;
+		velocity.x = position.x - previousPosition.x;
+		velocity.y = position.y - previousPosition.y;
+		return velocity;
+	}
+
+	void update(const float deltaTime)
+	{
+		// Verlet Integration
+		// x(t + dt) = 2x(t) - x(t - dt) + a * dt * dt
+		Vector2 positionComponent;
+		Vector2 accelerationComponent;
+		Vector2 frictionComponent;
+
+		// TODO: (2.f - damping)?
+		positionComponent.x = 2.f * position.x - previousPosition.x;
+		positionComponent.y = 2.f * position.y - previousPosition.y;
+		accelerationComponent.x = acceleration.x * deltaTime * deltaTime;
+		accelerationComponent.y = acceleration.y * deltaTime * deltaTime;
+		frictionComponent.x = (position.x - previousPosition.x) * friction * -1.f;
+		frictionComponent.y = (position.y - previousPosition.y) * friction * -1.f;
+
+		previousPosition = position;
+		position.x = positionComponent.x + accelerationComponent.x;
+		position.y = positionComponent.y + accelerationComponent.y;
+		position.x = positionComponent.x + accelerationComponent.x + frictionComponent.x;
+		position.y = positionComponent.y + accelerationComponent.y + frictionComponent.y;
+
+		acceleration = {0.f, 0.f};
+	}
 };

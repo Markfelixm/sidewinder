@@ -2,12 +2,10 @@
 
 #include "World.hpp"
 #include "BoundingBox.hpp"
-
 #include "raylib.h"
 
 namespace Sidewinder
 {
-
 	class Camera
 	{
 	public:

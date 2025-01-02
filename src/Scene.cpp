@@ -10,8 +10,7 @@ void Scene::update(const float deltaTime)
 	{
 		world.update(deltaTime);
 		// TODO: move camera position with spring attached to target, target is anchor/fixed
-		std::unique_ptr<SoftBody> &target = world.getEntities().front();
-		camera.setCameraCenterInWorld(target->getCenterPosition());
+		camera.setCameraCenterInWorld(world.getPlayer().getCenterPosition());
 	}
 }
 
@@ -22,5 +21,6 @@ void Scene::draw()
 		if (camera.getBoundingBox().intersects(entity->getBoundingBox()))
 			entity->draw(camera);
 	}
+	world.getPlayer().draw(camera);
 	editor.draw(camera);
 }

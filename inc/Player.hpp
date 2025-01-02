@@ -1,8 +1,13 @@
 #pragma once
 
 #include "SoftBody.hpp"
-#include "Camera.hpp"
 #include "Input.hpp"
+#include "raylib.h"
+
+namespace Sidewinder
+{
+	class Camera;
+}
 
 class Player : public SoftBody
 {
