@@ -40,6 +40,8 @@ src/Game.cpp
 inc/PointMass.hpp
 inc/Spring.hpp
 inc/SpringBox.hpp
+inc/Shape.hpp
+inc/Framed.hpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

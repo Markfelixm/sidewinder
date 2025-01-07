@@ -3,7 +3,7 @@
 // #include "Input.hpp"
 // #include "Scene.hpp"
 #include "raylib.h"
-
+#include "Framed.hpp"
 #include "SpringBox.hpp"
 #include "Shape.hpp"
 #include <memory>
@@ -31,6 +31,5 @@ private:
 	// Scene scene;
 	// Retry retry;
 
-	std::unique_ptr<SpringBox> box;
-	std::unique_ptr<Shape> shape;
+	std::unique_ptr<Framed> framed;
 };
