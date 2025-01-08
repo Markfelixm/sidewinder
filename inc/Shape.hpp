@@ -96,6 +96,15 @@ struct Shape
 		}
 	}
 
+	void move(Vector2 &displacement)
+	{
+		for (auto &point : points)
+		{
+			point.position.x += displacement.x;
+			point.position.y += displacement.y;
+		}
+	}
+
 	void draw(Color color)
 	{
 		Vector2 *positions = new Vector2[points.size() + 1];

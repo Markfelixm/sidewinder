@@ -24,13 +24,7 @@ struct Framed
 	{
 		// match position and rotation of the frame to actual points
 		Vector2 displacement = Vector2Subtract(actual.getCenter(), frame.getCenter());
-		for (auto &anchor : frame.points)
-		{
-			anchor.position.x += displacement.x;
-			anchor.position.y += displacement.y;
-			// anchor.acceleration.x += displacement.x;
-			// anchor.acceleration.y += displacement.y;
-		}
+		frame.move(displacement);
 		float rotationOffset = actual.getRotation() - frame.getRotation();
 		frame.rotate(rotationOffset);
 

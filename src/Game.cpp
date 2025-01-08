@@ -5,44 +5,51 @@
 Game::Game()
 // :  viewState(SCENE), input(Input()), scene(Scene(input))
 {
+	PointMass x = PointMass({200.f, 200.f}, 10.f);
+	PointMass y = PointMass({180.f, 220.f}, 10.f);
+	PointMass z = PointMass({220.f, 220.f}, 10.f);
+	std::vector<PointMass> xyz = {x, y, z};
+	attacker = std::make_unique<Framed>(xyz, 200.f);
+
 	PointMass a = PointMass({500.f, 500.f}, 10.f);
 	PointMass b = PointMass({600.f, 550.f}, 10.f);
 	PointMass c = PointMass({700.f, 500.f}, 10.f);
 	PointMass d = PointMass({800.f, 700.f}, 10.f);
 	PointMass e = PointMass({400.f, 700.f}, 10.f);
 	std::vector<PointMass> points = {a, b, c, d, e};
-	framed = std::make_unique<Framed>(points, 200.f);
+	defender = std::make_unique<Framed>(points, 200.f);
 }
 
 void Game::draw()
 {
 	BeginDrawing();
 	ClearBackground(LIGHTGRAY);
-	Color color = BLUE;
 	Vector2 mouse = GetMousePosition();
-	if (contains(mouse, framed->actual.points))
+	attacker->draw(RED);
+	Color color = BLUE;
+	if (collides(attacker->actual, defender->actual))
 		color = YELLOW;
-	framed->draw(color);
+	defender->draw(color);
 	DrawFPS(GetScreenWidth() - 80, 10);
 	EndDrawing();
 }
 
 void Game::update(float deltaTime)
 {
+	attacker->update(deltaTime);
+	defender->update(deltaTime);
 
+	Vector2 mouse = GetMousePosition();
 	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
 	{
-
-		framed->actual.rotate(1.5f);
-		// framed->frame.rotate(1.5f);
-		// framed->actual.points.at(0).position = GetMousePosition();
-		// framed->frame.points.at(0).position = GetMousePosition();
+		Vector2 ac = attacker->frame.getCenter();
+		Vector2 ad = {mouse.x - ac.x, mouse.y - ac.y};
+		attacker->actual.move(ad);
 	}
 	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON))
 	{
-		framed->actual.points.at(3).position = GetMousePosition();
-		// framed->actual.rotate(-1.5f);
+		Vector2 dc = defender->frame.getCenter();
+		Vector2 dd = {mouse.x - dc.x, mouse.y - dc.y};
+		defender->actual.move(dd);
 	}
-
-	framed->update(deltaTime);
 }

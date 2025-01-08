@@ -31,5 +31,6 @@ private:
 	// Scene scene;
 	// Retry retry;
 
-	std::unique_ptr<Framed> framed;
+	std::unique_ptr<Framed> attacker;
+	std::unique_ptr<Framed> defender;
 };

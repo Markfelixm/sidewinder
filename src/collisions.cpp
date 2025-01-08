@@ -4,7 +4,16 @@ static bool isHorizontalIntersect(Vector2 &point, Vector2 &a, Vector2 &b);
 
 bool collides(Shape &attacker, Shape &defender)
 {
-	return true;
+	// TODO: AABB check OR RATHER sweep and prune beforehand
+
+	for (auto &point : attacker.points)
+	{
+		// TODO: if contains, resolve (consider if better to resolve immediately or after all contains are checked)
+		if (contains(point.position, defender.points))
+			return true;
+	}
+
+	return false;
 }
 
 bool contains(Vector2 &position, std::vector<PointMass> &container)
