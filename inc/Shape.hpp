@@ -8,41 +8,41 @@
 
 struct Shape
 {
-	std::vector<PointMass> vertices;
+	std::vector<PointMass> points;
 	Vector2 acceleration;
 
 	Shape() : acceleration({0.f, 0.f}) {}
 
-	Shape(std::vector<PointMass> &vertices) : vertices(vertices), acceleration({0.f, 0.f}) {}
+	Shape(std::vector<PointMass> &points) : points(points), acceleration({0.f, 0.f}) {}
 
 	void addPointMass(PointMass &pointMass)
 	{
-		vertices.push_back(pointMass);
+		points.push_back(pointMass);
 	}
 
 	void update(float deltaTime)
 	{
-		for (auto &vertex : vertices)
+		for (auto &point : points)
 		{
-			vertex.acceleration.x += acceleration.x;
-			vertex.acceleration.y += acceleration.y;
-			vertex.update(deltaTime);
+			point.acceleration.x += acceleration.x;
+			point.acceleration.y += acceleration.y;
+			point.update(deltaTime);
 		}
 		acceleration = {0.f, 0.f};
 	}
 
 	void setFriction(float friction)
 	{
-		for (auto &vertex : vertices)
-			vertex.friction = friction;
+		for (auto &point : points)
+			point.friction = friction;
 	}
 
 	Vector2 getCenter()
 	{
 		Vector2 center = {0.f, 0.f};
-		for (auto &vertex : vertices)
-			center = Vector2Add(center, vertex.position);
-		center = Vector2Scale(center, 1.f / vertices.size());
+		for (auto &point : points)
+			center = Vector2Add(center, point.position);
+		center = Vector2Scale(center, 1.f / points.size());
 		return center;
 	}
 
@@ -52,10 +52,10 @@ struct Shape
 		float previous = 0.f;
 
 		Vector2 center = getCenter();
-		for (auto &vertex : vertices)
+		for (auto &point : points)
 		{
-			float dx = vertex.position.x - center.x;
-			float dy = vertex.position.y - center.y;
+			float dx = point.position.x - center.x;
+			float dy = point.position.y - center.y;
 			float angle = std::atan2(dy, dx);
 
 			// avoid discontinuity
@@ -67,7 +67,7 @@ struct Shape
 			rotation += angle;
 			previous = angle;
 		}
-		rotation /= vertices.size();
+		rotation /= points.size();
 		return rotation * RAD2DEG;
 	}
 
@@ -77,32 +77,32 @@ struct Shape
 		float sinTheta = std::sin(degrees * DEG2RAD);
 		Vector2 center = getCenter();
 
-		for (auto &vertex : vertices)
+		for (auto &point : points)
 		{
 			// to make verlet happy: store velocity, then rotate, then recalculate previousPosition to discard angular velocity
-			Vector2 velocity = vertex.getVelocity();
+			Vector2 velocity = point.getVelocity();
 
-			float translatedX = vertex.position.x - center.x;
-			float translatedY = vertex.position.y - center.y;
+			float translatedX = point.position.x - center.x;
+			float translatedY = point.position.y - center.y;
 
 			float rotatedX = cosTheta * translatedX - sinTheta * translatedY;
 			float rotatedY = sinTheta * translatedX + cosTheta * translatedY;
 
-			vertex.position.x = rotatedX + center.x;
-			vertex.position.y = rotatedY + center.y;
+			point.position.x = rotatedX + center.x;
+			point.position.y = rotatedY + center.y;
 
-			vertex.previousPosition.x = vertex.position.x - velocity.x;
-			vertex.previousPosition.y = vertex.position.y - velocity.y;
+			point.previousPosition.x = point.position.x - velocity.x;
+			point.previousPosition.y = point.position.y - velocity.y;
 		}
 	}
 
 	void draw(Color color)
 	{
-		Vector2 *positions = new Vector2[vertices.size() + 1];
-		for (size_t i = 0; i < vertices.size(); i++)
-			positions[i] = vertices[i].position;
-		positions[vertices.size()] = vertices[0].position;
+		Vector2 *positions = new Vector2[points.size() + 1];
+		for (size_t i = 0; i < points.size(); i++)
+			positions[i] = points[i].position;
+		positions[points.size()] = points[0].position;
 
-		DrawSplineLinear(positions, vertices.size() + 1, 10.f, color);
+		DrawSplineLinear(positions, points.size() + 1, 10.f, color);
 	}
 };

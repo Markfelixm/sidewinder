@@ -1,6 +1,7 @@
 #pragma once
 
 // TODO: some joint system, e.g.pointmass has bool / reference to point that makes update just copy location of joint
+// TODO: use shapes
 
 #include "PointMass.hpp"
 #include "Spring.hpp"

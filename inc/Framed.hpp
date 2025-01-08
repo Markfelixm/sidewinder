@@ -10,21 +10,21 @@ struct Framed
 	Shape actual;
 	std::vector<FixedSpring> springs;
 
-	Framed(std::vector<PointMass> &vertices, float stiffness)
+	Framed(std::vector<PointMass> &points, float stiffness)
 	{
-		frame = Shape(vertices);
+		frame = Shape(points);
 		frame.setFriction(0.f);
-		actual = Shape(vertices);
+		actual = Shape(points);
 		actual.setFriction(0.02f);
-		for (size_t i = 0; i < vertices.size(); i++)
-			springs.push_back(FixedSpring(frame.vertices.at(i), actual.vertices.at(i), stiffness));
+		for (size_t i = 0; i < points.size(); i++)
+			springs.push_back(FixedSpring(frame.points.at(i), actual.points.at(i), stiffness));
 	}
 
 	void update(float deltaTime)
 	{
-		// match position and rotation of the frame to actual vertices
+		// match position and rotation of the frame to actual points
 		Vector2 displacement = Vector2Subtract(actual.getCenter(), frame.getCenter());
-		for (auto &anchor : frame.vertices)
+		for (auto &anchor : frame.points)
 		{
 			anchor.position.x += displacement.x;
 			anchor.position.y += displacement.y;
@@ -41,9 +41,9 @@ struct Framed
 		actual.update(deltaTime);
 	}
 
-	void draw()
+	void draw(Color color)
 	{
-		frame.draw(ColorAlpha(BLUE, 0.2f));
-		actual.draw(BLUE);
+		frame.draw(ColorAlpha(color, 0.2f));
+		actual.draw(color);
 	}
 };

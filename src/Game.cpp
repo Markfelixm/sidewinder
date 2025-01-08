@@ -1,5 +1,5 @@
 #include "Game.hpp"
-
+#include "Collisions.hpp"
 #include "raymath.h"
 
 Game::Game()
@@ -18,7 +18,11 @@ void Game::draw()
 {
 	BeginDrawing();
 	ClearBackground(LIGHTGRAY);
-	framed->draw();
+	Color color = BLUE;
+	Vector2 mouse = GetMousePosition();
+	if (contains(mouse, framed->actual.points))
+		color = YELLOW;
+	framed->draw(color);
 	DrawFPS(GetScreenWidth() - 80, 10);
 	EndDrawing();
 }
@@ -31,12 +35,12 @@ void Game::update(float deltaTime)
 
 		framed->actual.rotate(1.5f);
 		// framed->frame.rotate(1.5f);
-		// framed->actual.vertices.at(0).position = GetMousePosition();
-		// framed->frame.vertices.at(0).position = GetMousePosition();
+		// framed->actual.points.at(0).position = GetMousePosition();
+		// framed->frame.points.at(0).position = GetMousePosition();
 	}
 	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON))
 	{
-		framed->actual.vertices.at(3).position = GetMousePosition();
+		framed->actual.points.at(3).position = GetMousePosition();
 		// framed->actual.rotate(-1.5f);
 	}
 
