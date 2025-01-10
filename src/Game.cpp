@@ -30,6 +30,11 @@ void Game::draw()
 	if (collides(attacker->actual, defender->actual))
 		color = YELLOW;
 	defender->draw(color);
+	if (contains(defender->actual.points, mouse))
+	{
+		Edge nearest = findNearestEdge(defender->actual.points, mouse);
+		DrawLineEx(nearest.a.position, nearest.b.position, 15.f, ORANGE);
+	}
 	DrawFPS(GetScreenWidth() - 80, 10);
 	EndDrawing();
 }
@@ -52,4 +57,6 @@ void Game::update(float deltaTime)
 		Vector2 dd = {mouse.x - dc.x, mouse.y - dc.y};
 		defender->actual.move(dd);
 	}
+
+	handleCollision(attacker->actual, defender->actual);
 }
