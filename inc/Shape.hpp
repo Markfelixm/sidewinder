@@ -105,6 +105,20 @@ struct Shape
 		}
 	}
 
+	void setPosition(Vector2 &position)
+	{
+		Vector2 current = getCenter();
+		Vector2 displacement = {position.x - current.x, position.y - current.y};
+
+		for (auto &point : points)
+		{
+			point.position.x += displacement.x;
+			point.previousPosition.x = point.position.x;
+			point.position.y += displacement.y;
+			point.previousPosition.y = point.position.y;
+		}
+	}
+
 	void draw(Color color)
 	{
 		Vector2 *positions = new Vector2[points.size() + 1];

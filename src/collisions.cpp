@@ -44,34 +44,22 @@ void resolve(Shape &defender, PointMass &collider)
 {
 	// TODO: avoid recalculating
 	Edge nearest = findNearestEdge(defender.points, collider.position);
-
-	float depth = std::sqrt(distanceSquaredToEdge(nearest, collider.position));
-	if (depth == 0.f)
-		return;
-
-	float t = relativePosition(nearest, collider.position);
 	Vector2 projection = projectOntoEdge(nearest, collider.position);
+	Vector2 resolution = {projection.x - collider.position.x, projection.y - collider.position.y};
 
-	Vector2 direction = {projection.x - collider.position.x, projection.y - collider.position.y};
-	direction.x /= depth;
-	direction.y /= depth;
+	float edgeMassRatio = collider.mass / (collider.mass + nearest.a.mass + nearest.b.mass);
+	float colliderMassRatio = 1.f - edgeMassRatio;
+	float t = relativePosition(nearest, collider.position);
+	float aMassRatio = (1.f - t) * edgeMassRatio;
+	float bMassRatio = t * edgeMassRatio;
 
-	float totalMass = collider.mass + nearest.a.mass + nearest.b.mass;
-	if (totalMass == 0.f)
-		totalMass = 1.f;
-	float colliderMassRatio = collider.mass / totalMass;
-	float aMassRatio = nearest.a.mass / totalMass;
-	float bMassRatio = nearest.b.mass / totalMass;
-	aMassRatio *= 1.f - t;
-	bMassRatio *= t;
+	collider.position.x += resolution.x * colliderMassRatio;
+	collider.position.y += resolution.y * colliderMassRatio;
 
-	collider.position.x += direction.x * depth * colliderMassRatio;
-	collider.position.y += direction.y * depth * colliderMassRatio;
-
-	nearest.a.position.x -= direction.x * depth * aMassRatio;
-	nearest.a.position.y -= direction.y * depth * aMassRatio;
-	nearest.b.position.x -= direction.x * depth * bMassRatio;
-	nearest.b.position.y -= direction.y * depth * bMassRatio;
+	nearest.a.position.x -= resolution.x * aMassRatio;
+	nearest.a.position.y -= resolution.y * aMassRatio;
+	nearest.b.position.x -= resolution.x * bMassRatio;
+	nearest.b.position.y -= resolution.y * bMassRatio;
 }
 
 bool isHorizontalIntersect(Vector2 &point, Vector2 &a, Vector2 &b)
