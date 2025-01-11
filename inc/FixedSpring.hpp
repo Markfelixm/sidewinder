@@ -3,6 +3,7 @@
 #include "PointMass.hpp"
 #include "raymath.h"
 
+// TODO: what about a springToMass factor instead of stiffness? multiply end.mass by factor to use in place of stiffness or spring strength
 struct FixedSpring
 {
 	PointMass &anchor;
@@ -14,21 +15,16 @@ struct FixedSpring
 
 	void apply()
 	{
-		// TODO: write out operations instead of raymath
-		Vector2 delta = Vector2Subtract(end.position, anchor.position);
-		float currentLength = Vector2Length(delta);
-
-		Vector2 direction = Vector2Normalize(delta);
+		Vector2 delta = {end.position.x - anchor.position.x, end.position.y - anchor.position.y};
+		float currentLength = std::sqrt(delta.x * delta.x + delta.y * delta.y);
+		if (currentLength == 0.f || end.mass == 0.f)
+			return;
+		Vector2 direction = {delta.x / currentLength, delta.y / currentLength};
 		float displacement = currentLength - restLength;
-		Vector2 force = Vector2Scale(direction, -stiffness * displacement);
 
-		Vector2 acceleration = Vector2Scale(force, 1.0f / end.mass);
-		end.acceleration = Vector2Add(end.acceleration, acceleration);
+		Vector2 force = {-direction.x * stiffness * displacement, -direction.y * stiffness * displacement};
 
-		// TODO: damping?
-		// Vector2 velocity = end.getVelocity();
-		// float dampingFactor = 0.1f; // Adjust as needed
-		// Vector2 dampingForce = Vector2Scale(velocity, -dampingFactor);
-		// end.acceleration = Vector2Add(end.acceleration, Vector2Scale(dampingForce, 1.0f / end.mass));
+		end.acceleration.x += force.x / end.mass;
+		end.acceleration.y += force.y / end.mass;
 	}
 };
