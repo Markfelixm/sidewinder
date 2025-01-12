@@ -4,7 +4,6 @@
 // #include "Scene.hpp"
 #include "raylib.h"
 #include "Framed.hpp"
-#include "SpringBox.hpp"
 #include "Shape.hpp"
 #include <memory>
 

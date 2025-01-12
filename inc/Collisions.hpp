@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Vector.hpp"
 #include "PointMass.hpp"
 #include "Shape.hpp"
 #include <vector>
@@ -13,11 +14,10 @@ struct Edge
 };
 
 bool collides(Shape &attacker, Shape &defender);
-bool contains(std::vector<PointMass> &container, Vector2 &position);
+bool contains(std::vector<PointMass> &container, V2 &position);
 void handleCollision(Shape &attacker, Shape &defender);
 void resolve(Shape &defender, PointMass &collider);
-bool isHorizontalIntersect(Vector2 &point, Vector2 &a, Vector2 &b);
-float relativePosition(const Edge &edge, const Vector2 &position);
-Vector2 projectOntoEdge(const Edge &edge, const Vector2 &position);
-float distanceSquaredToEdge(const Edge &edge, const Vector2 &position);
-Edge findNearestEdge(std::vector<PointMass> &points, Vector2 &position);
+bool isHorizontalIntersect(const V2 &point, const V2 &a, const V2 &b);
+float relativePosition(const Edge &edge, const V2 &position);
+V2 projectOntoEdge(const Edge &edge, const V2 &position);
+Edge findNearestEdge(std::vector<PointMass> &points, V2 &position);

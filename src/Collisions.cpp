@@ -14,7 +14,7 @@ bool collides(Shape &attacker, Shape &defender)
 	return false;
 }
 
-bool contains(std::vector<PointMass> &container, Vector2 &position)
+bool contains(std::vector<PointMass> &container, V2 &position)
 {
 	// horizontal even-odd collision check
 	int intersectionCount = 0;
@@ -44,8 +44,8 @@ void resolve(Shape &defender, PointMass &collider)
 {
 	// TODO: avoid recalculating
 	Edge nearest = findNearestEdge(defender.points, collider.position);
-	Vector2 projection = projectOntoEdge(nearest, collider.position);
-	Vector2 resolution = {projection.x - collider.position.x, projection.y - collider.position.y};
+	V2 projection = projectOntoEdge(nearest, collider.position);
+	V2 resolution = projection - collider.position;
 
 	float edgeMassRatio = collider.mass / (collider.mass + nearest.a.mass + nearest.b.mass);
 	float colliderMassRatio = 1.f - edgeMassRatio;
@@ -53,19 +53,16 @@ void resolve(Shape &defender, PointMass &collider)
 	float aMassRatio = (1.f - t) * edgeMassRatio;
 	float bMassRatio = t * edgeMassRatio;
 
-	collider.position.x += resolution.x * colliderMassRatio;
-	collider.position.y += resolution.y * colliderMassRatio;
+	collider.position += resolution * colliderMassRatio;
 
-	nearest.a.position.x -= resolution.x * aMassRatio;
-	nearest.a.position.y -= resolution.y * aMassRatio;
-	nearest.b.position.x -= resolution.x * bMassRatio;
-	nearest.b.position.y -= resolution.y * bMassRatio;
+	nearest.a.position -= resolution * aMassRatio;
+	nearest.b.position -= resolution * bMassRatio;
 }
 
-bool isHorizontalIntersect(Vector2 &point, Vector2 &a, Vector2 &b)
+bool isHorizontalIntersect(const V2 &point, const V2 &a, const V2 &b)
 {
-	Vector2 lower = a;
-	Vector2 upper = b;
+	V2 lower = a;
+	V2 upper = b;
 
 	if (a.y > b.y)
 	{
@@ -83,39 +80,26 @@ bool isHorizontalIntersect(Vector2 &point, Vector2 &a, Vector2 &b)
 	return intersectX > point.x;
 }
 
-float relativePosition(const Edge &edge, const Vector2 &position)
+float relativePosition(const Edge &edge, const V2 &position)
 {
 	// the progress of projection along edge, from 0 to 1
-	Vector2 ab = {edge.b.position.x - edge.a.position.x, edge.b.position.y - edge.a.position.y};
-	Vector2 ap = {position.x - edge.a.position.x, position.y - edge.a.position.y};
+	V2 ab = edge.b.position - edge.a.position;
+	V2 ap = position - edge.a.position;
 
-	float edgeLengthSquared = ab.x * ab.x + ab.y * ab.y;
-	float dot = ap.x * ab.x + ap.y * ab.y;
-	float t = dot / edgeLengthSquared;
+	float t = ap.dot(ab) / ab.lengthSquared();
 
 	return std::fmax(0.f, std::fmin(1.f, t));
 }
 
-Vector2 projectOntoEdge(const Edge &edge, const Vector2 &position)
+V2 projectOntoEdge(const Edge &edge, const V2 &position)
 {
 	float t = relativePosition(edge, position);
+	V2 ab = edge.b.position - edge.a.position;
 
-	Vector2 ab = {edge.b.position.x - edge.a.position.x, edge.b.position.y - edge.a.position.y};
-
-	return {
-		edge.a.position.x + t * ab.x,
-		edge.a.position.y + t * ab.y};
+	return edge.a.position + (ab * t);
 }
 
-float distanceSquaredToEdge(const Edge &edge, const Vector2 &position)
-{
-	Vector2 projection = projectOntoEdge(edge, position);
-	Vector2 delta = {position.x - projection.x, position.y - projection.y};
-
-	return delta.x * delta.x + delta.y * delta.y;
-}
-
-Edge findNearestEdge(std::vector<PointMass> &points, Vector2 &position)
+Edge findNearestEdge(std::vector<PointMass> &points, V2 &position)
 {
 	float minDistance = std::numeric_limits<float>::max();
 	size_t nearestEdgeIndex = 0;
@@ -123,7 +107,9 @@ Edge findNearestEdge(std::vector<PointMass> &points, Vector2 &position)
 	for (size_t i = 0; i < points.size(); i++)
 	{
 		Edge edge = {points[i], points[(i + 1) % points.size()]};
-		float distance = distanceSquaredToEdge(edge, position);
+
+		V2 projection = projectOntoEdge(edge, position);
+		float distance = (position - projection).lengthSquared();
 
 		if (distance < minDistance)
 		{

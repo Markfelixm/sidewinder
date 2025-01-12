@@ -38,13 +38,15 @@ file(GLOB_RECURSE SOURCES
 src/main.cpp
 src/Game.cpp
 src/Collisions.cpp
+inc/Vector.hpp
 inc/PointMass.hpp
+inc/AABB.hpp
 inc/Spring.hpp
 inc/FixedSpring.hpp
-inc/SpringBox.hpp
 inc/Shape.hpp
 inc/Framed.hpp
 inc/Collisions.hpp
+inc/Input.hpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Vector.hpp"
+#include "PointMass.hpp"
 #include "Shape.hpp"
 #include "FixedSpring.hpp"
 #include <vector>
@@ -23,7 +25,7 @@ struct Framed
 	void update(float deltaTime)
 	{
 		// match position and rotation of the frame to actual points
-		Vector2 displacement = Vector2Subtract(actual.getCenter(), frame.getCenter());
+		V2 displacement = actual.getCenter() - frame.getCenter();
 		frame.move(displacement);
 		float rotationOffset = actual.getRotation() - frame.getRotation();
 		frame.rotate(rotationOffset);

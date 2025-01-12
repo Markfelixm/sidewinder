@@ -1,31 +1,28 @@
 #pragma once
 
+#include "Vector.hpp"
 #include "PointMass.hpp"
 #include "raylib.h"
-#include "raymath.h"
 #include <vector>
 #include <cmath>
+#include <numbers>
 
 struct Shape
 {
 	std::vector<PointMass> points;
-	Vector2 acceleration;
+	V2 acceleration;
 
 	Shape() : acceleration({0.f, 0.f}) {}
 
 	Shape(std::vector<PointMass> &points) : points(points), acceleration({0.f, 0.f}) {}
 
-	void addPointMass(PointMass &pointMass)
-	{
-		points.push_back(pointMass);
-	}
+	void addPointMass(PointMass &pointMass) { points.push_back(pointMass); }
 
 	void update(float deltaTime)
 	{
 		for (auto &point : points)
 		{
-			point.acceleration.x += acceleration.x;
-			point.acceleration.y += acceleration.y;
+			point.acceleration += acceleration;
 			point.update(deltaTime);
 		}
 		acceleration = {0.f, 0.f};
@@ -37,12 +34,12 @@ struct Shape
 			point.friction = friction;
 	}
 
-	Vector2 getCenter()
+	V2 getCenter()
 	{
-		Vector2 center = {0.f, 0.f};
+		V2 center = {0.f, 0.f};
 		for (auto &point : points)
-			center = Vector2Add(center, point.position);
-		center = Vector2Scale(center, 1.f / points.size());
+			center += point.position;
+		center /= points.size();
 		return center;
 	}
 
@@ -51,7 +48,7 @@ struct Shape
 		float rotation = 0.f;
 		float previous = 0.f;
 
-		Vector2 center = getCenter();
+		V2 center = getCenter();
 		for (auto &point : points)
 		{
 			float dx = point.position.x - center.x;
@@ -73,49 +70,38 @@ struct Shape
 
 	void rotate(float degrees)
 	{
-		float cosTheta = std::cos(degrees * DEG2RAD);
-		float sinTheta = std::sin(degrees * DEG2RAD);
-		Vector2 center = getCenter();
+		float radians = degrees * std::numbers::pi / 180.f;
+		float cosTheta = std::cos(radians);
+		float sinTheta = std::sin(radians);
+		V2 center = getCenter();
 
 		for (auto &point : points)
 		{
 			// to make verlet happy: store velocity, then rotate, then recalculate previousPosition to discard angular velocity
-			Vector2 velocity = point.getVelocity();
+			V2 velocity = point.getVelocity();
 
-			float translatedX = point.position.x - center.x;
-			float translatedY = point.position.y - center.y;
+			V2 translated = point.position - center;
+			V2 rotated = {cosTheta * translated.x - sinTheta * translated.y, sinTheta * translated.x + cosTheta * translated.y};
 
-			float rotatedX = cosTheta * translatedX - sinTheta * translatedY;
-			float rotatedY = sinTheta * translatedX + cosTheta * translatedY;
-
-			point.position.x = rotatedX + center.x;
-			point.position.y = rotatedY + center.y;
-
-			point.previousPosition.x = point.position.x - velocity.x;
-			point.previousPosition.y = point.position.y - velocity.y;
+			point.position = rotated + center;
+			point.previousPosition = point.position - velocity;
 		}
 	}
 
-	void move(Vector2 &displacement)
+	void move(V2 &displacement)
 	{
 		for (auto &point : points)
-		{
-			point.position.x += displacement.x;
-			point.position.y += displacement.y;
-		}
+			point.position += displacement;
 	}
 
-	void setPosition(Vector2 &position)
+	void setPosition(V2 &position)
 	{
-		Vector2 current = getCenter();
-		Vector2 displacement = {position.x - current.x, position.y - current.y};
+		V2 displacement = position - getCenter();
 
 		for (auto &point : points)
 		{
-			point.position.x += displacement.x;
-			point.previousPosition.x = point.position.x;
-			point.position.y += displacement.y;
-			point.previousPosition.y = point.position.y;
+			point.position += displacement;
+			point.previousPosition = point.position;
 		}
 	}
 
@@ -123,8 +109,12 @@ struct Shape
 	{
 		Vector2 *positions = new Vector2[points.size() + 1];
 		for (size_t i = 0; i < points.size(); i++)
-			positions[i] = points[i].position;
-		positions[points.size()] = points[0].position;
+		{
+			positions[i].x = points[i].position.x;
+			positions[i].y = points[i].position.y;
+		}
+		positions[points.size()].x = points[0].position.x;
+		positions[points.size()].y = points[0].position.y;
 
 		DrawSplineLinear(positions, points.size() + 1, 10.f, color);
 	}

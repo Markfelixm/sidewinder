@@ -1,5 +1,6 @@
 #pragma once
 
+#include "Vector.hpp"
 #include "PointMass.hpp"
 #include "raylib.h"
 #include <vector>
@@ -36,7 +37,7 @@ struct AABB
 		}
 	}
 
-	bool contains(Vector2 &position)
+	bool contains(V2 &position)
 	{
 		return (position.x >= left && position.x <= right &&
 				position.y >= top && position.y <= bottom);
@@ -46,8 +47,8 @@ struct AABB
 		return !(right < other.left || left > other.right || bottom < other.top || top > other.bottom);
 	}
 
-	void draw()
+	void draw(Color color)
 	{
-		DrawRectangle(left, top, right - left, bottom - top, BLUE);
+		DrawRectangle(left, top, right - left, bottom - top, color);
 	}
 };
