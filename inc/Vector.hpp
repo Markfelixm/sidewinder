@@ -70,4 +70,19 @@ struct V2
 			return V2(x / magnitude, y / magnitude);
 		return V2(0.f, 0.f);
 	}
+
+	float angle() const { return std::atan2(y, x); }
+
+	float angleBetween(const V2 &other) const
+	{
+		float dotProduct = dot(other);
+		float magnitudes = length() * other.length();
+		if (magnitudes == 0.f)
+			return 0.f;
+
+		float cosTheta = dotProduct / magnitudes;
+		cosTheta = std::fmax(-1.f, std::fmin(1.f, cosTheta));
+
+		return std::acos(cosTheta);
+	}
 };

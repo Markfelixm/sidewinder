@@ -51,9 +51,7 @@ struct Shape
 		V2 center = getCenter();
 		for (auto &point : points)
 		{
-			float dx = point.position.x - center.x;
-			float dy = point.position.y - center.y;
-			float angle = std::atan2(dy, dx);
+			float angle = (point.position - center).angle();
 
 			// avoid discontinuity
 			while (angle - previous > M_PI)
@@ -65,7 +63,8 @@ struct Shape
 			previous = angle;
 		}
 		rotation /= points.size();
-		return rotation * RAD2DEG;
+
+		return rotation * 180.f / std::numbers::pi;
 	}
 
 	void rotate(float degrees)
