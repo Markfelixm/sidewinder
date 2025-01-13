@@ -24,17 +24,18 @@ struct Framed
 
 	void update(float deltaTime)
 	{
+
+		for (auto &spring : springs)
+			spring.apply();
+
+		actual.update(deltaTime);
+		frame.update(deltaTime);
+
 		// match position and rotation of the frame to actual points
 		V2 displacement = actual.getCenter() - frame.getCenter();
 		frame.move(displacement);
 		float rotationOffset = actual.getRotation() - frame.getRotation();
 		frame.rotate(rotationOffset);
-
-		for (auto &spring : springs)
-			spring.apply();
-
-		frame.update(deltaTime);
-		actual.update(deltaTime);
 	}
 
 	void draw(Color color)

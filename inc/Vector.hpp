@@ -85,4 +85,11 @@ struct V2
 
 		return std::acos(cosTheta);
 	}
+
+	V2 lerp(const V2 &b, const float t) const
+	{
+		return V2(
+			x + t * (b.x - x),
+			y + t * (b.y - y));
+	}
 };

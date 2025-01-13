@@ -47,6 +47,7 @@ inc/Shape.hpp
 inc/Framed.hpp
 inc/Collisions.hpp
 inc/Input.hpp
+inc/Animated.hpp
 )
 
 add_executable(${PROJECT_NAME} ${SOURCES})

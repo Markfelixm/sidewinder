@@ -11,12 +11,17 @@ struct Shape
 {
 	std::vector<PointMass> points;
 	V2 acceleration;
+	float initialRotation;
 
-	Shape() : acceleration({0.f, 0.f}) {}
+	Shape() : acceleration({0.f, 0.f}), initialRotation(0.f) {}
 
-	Shape(std::vector<PointMass> &points) : points(points), acceleration({0.f, 0.f}) {}
+	Shape(std::vector<PointMass> &points) : points(points), acceleration({0.f, 0.f}), initialRotation(getRotation()) {}
 
-	void addPointMass(PointMass &pointMass) { points.push_back(pointMass); }
+	void addPointMass(PointMass &pointMass)
+	{
+		points.push_back(pointMass);
+		initialRotation = getRotation();
+	}
 
 	void update(float deltaTime)
 	{
@@ -85,6 +90,12 @@ struct Shape
 			point.position = rotated + center;
 			point.previousPosition = point.position - velocity;
 		}
+	}
+
+	void setRotation(float degrees)
+	{
+		float offset = degrees - getRotation() + initialRotation;
+		rotate(offset);
 	}
 
 	void move(V2 &displacement)

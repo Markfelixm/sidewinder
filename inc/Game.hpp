@@ -5,6 +5,7 @@
 #include "raylib.h"
 #include "Framed.hpp"
 #include "Shape.hpp"
+#include "Animated.hpp"
 #include <memory>
 
 class Game
@@ -32,4 +33,5 @@ private:
 
 	std::unique_ptr<Framed> attacker;
 	std::unique_ptr<Framed> defender;
+	std::unique_ptr<Animated> animated;
 };
