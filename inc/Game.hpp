@@ -33,5 +33,6 @@ private:
 
 	std::unique_ptr<Framed> attacker;
 	std::unique_ptr<Framed> defender;
-	std::unique_ptr<Animated> animated;
+	std::unique_ptr<Animated> once;
+	std::unique_ptr<Animated> looping;
 };

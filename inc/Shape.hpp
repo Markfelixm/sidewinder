@@ -50,6 +50,7 @@ struct Shape
 
 	float getRotation()
 	{
+		// TODO: fix: should return 0 - 360 range
 		float rotation = 0.f;
 		float previous = 0.f;
 
