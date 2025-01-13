@@ -23,7 +23,7 @@ Game::Game()
 	animated->createKeyframe(10.f, {1400.f, 800.f}, 0.f);
 	animated->createKeyframe(20.f, {1400.f, 200.f}, 90.f);
 	animated->createKeyframe(40.f, {200.f, 200.f}, 90.f);
-	animated->action = Animated::action::PLAY;
+	animated->action = Animated::action::LOOP;
 }
 
 void Game::draw()

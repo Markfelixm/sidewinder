@@ -57,7 +57,14 @@ struct Animated
 			nextFrame++;
 		if (nextFrame == keyframes.size())
 		{
-			// TODO: pingpong, loop
+			// TODO: pingpong
+			if (action == LOOP)
+			{
+				nextFrame = 0;
+				elapsed = 0.f;
+				return;
+			}
+
 			action = END;
 			return;
 		}
