@@ -2,7 +2,6 @@
 
 #include "Vector.hpp"
 #include "PointMass.hpp"
-#include "raylib.h"
 #include <vector>
 
 struct AABB
@@ -12,10 +11,9 @@ struct AABB
 	float top;
 	float bottom;
 
-	AABB(std::vector<PointMass> &vertices)
-	{
-		resize(vertices);
-	}
+	AABB(float left, float right, float top, float bottom) : left(left), right(right), top(top), bottom(bottom) {}
+
+	AABB(std::vector<PointMass> &vertices) { resize(vertices); }
 
 	void resize(std::vector<PointMass> &vertices)
 	{
@@ -45,10 +43,5 @@ struct AABB
 	bool intersects(AABB &other)
 	{
 		return !(right < other.left || left > other.right || bottom < other.top || top > other.bottom);
-	}
-
-	void draw(Color color)
-	{
-		DrawRectangle(left, top, right - left, bottom - top, color);
 	}
 };

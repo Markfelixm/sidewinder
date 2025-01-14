@@ -2,6 +2,7 @@
 
 #include "Vector.hpp"
 #include "PointMass.hpp"
+#include "Viewport.hpp"
 #include "raylib.h"
 #include <vector>
 #include <cmath>
@@ -116,16 +117,16 @@ struct Shape
 		}
 	}
 
-	void draw(Color color)
+	void draw(Viewport &viewport, Color color)
 	{
 		Vector2 *positions = new Vector2[points.size() + 1];
 		for (size_t i = 0; i < points.size(); i++)
 		{
-			positions[i].x = points[i].position.x;
-			positions[i].y = points[i].position.y;
+			positions[i].x = viewport.worldToScreen(points[i].position).x;
+			positions[i].y = viewport.worldToScreen(points[i].position).y;
 		}
-		positions[points.size()].x = points[0].position.x;
-		positions[points.size()].y = points[0].position.y;
+		positions[points.size()].x = viewport.worldToScreen(points[0].position).x;
+		positions[points.size()].y = viewport.worldToScreen(points[0].position).y;
 
 		DrawSplineLinear(positions, points.size() + 1, 10.f, color);
 	}

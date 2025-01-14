@@ -4,6 +4,7 @@
 #include "PointMass.hpp"
 #include "Shape.hpp"
 #include "FixedSpring.hpp"
+#include "Viewport.hpp"
 #include <vector>
 
 struct Framed
@@ -38,9 +39,9 @@ struct Framed
 		frame.rotate(rotationOffset);
 	}
 
-	void draw(Color color)
+	void draw(Viewport &viewport, Color color)
 	{
-		frame.draw(ColorAlpha(color, 0.2f));
-		actual.draw(color);
+		frame.draw(viewport, ColorAlpha(color, 0.2f));
+		actual.draw(viewport, color);
 	}
 };
