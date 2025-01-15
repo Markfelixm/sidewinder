@@ -51,7 +51,6 @@ struct Shape
 
 	float getRotation()
 	{
-		// TODO: fix: should return 0 - 360 range
 		float rotation = 0.f;
 		float previous = 0.f;
 
@@ -71,7 +70,12 @@ struct Shape
 		}
 		rotation /= points.size();
 
-		return rotation * 180.f / std::numbers::pi;
+		rotation = rotation * 180.f / std::numbers::pi;
+		if (rotation < 0.f)
+			rotation += 360.f;
+		else if (rotation >= 360.f)
+			rotation -= 360.f;
+		return rotation;
 	}
 
 	void rotate(float degrees)
@@ -128,6 +132,6 @@ struct Shape
 		positions[points.size()].x = viewport.worldToScreen(points[0].position).x;
 		positions[points.size()].y = viewport.worldToScreen(points[0].position).y;
 
-		DrawSplineLinear(positions, points.size() + 1, 10.f, color);
+		DrawSplineLinear(positions, points.size() + 1, 10.f * viewport.zoom, color);
 	}
 };
