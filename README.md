@@ -1,5 +1,8 @@
 # Sidewinder
 
+NOTE: a rewrite is in progress, improving data structures and bringing new features like animations and splitscreen views. Check out the rewrite branch :)
+
+
 A softbody simulation based on [JellyCar's developer's vlog](https://www.youtube.com/watch?v=3OmkehAJoyo).  
 Made in C/C++ with raylib.  
 It can be played natively or in the browser.
