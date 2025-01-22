@@ -16,11 +16,15 @@ struct Shape
 
 	Shape() : acceleration({0.f, 0.f}), initialRotation(0.f) {}
 
-	Shape(std::vector<PointMass> &points) : points(points), acceleration({0.f, 0.f}), initialRotation(getRotation()) {}
+	Shape(std::vector<PointMass> &points) : points(points), acceleration({0.f, 0.f}), initialRotation(0.f)
+	{
+		initialRotation = getRotation();
+	}
 
 	void addPointMass(PointMass &pointMass)
 	{
 		points.push_back(pointMass);
+		initialRotation = 0.f;
 		initialRotation = getRotation();
 	}
 
@@ -51,6 +55,8 @@ struct Shape
 
 	float getRotation()
 	{
+		// TODO: find better way to avoid discontinuity jumps,
+		// get average angle of points, convert to degrees, zero initial rotation
 		float rotation = 0.f;
 		float previous = 0.f;
 
@@ -60,21 +66,22 @@ struct Shape
 			float angle = (point.position - center).angle();
 
 			// avoid discontinuity
-			while (angle - previous > M_PI)
-				angle -= 2.f * M_PI;
-			while (angle - previous < -M_PI)
-				angle += 2.f * M_PI;
+			while (angle - previous > std::numbers::pi)
+				angle -= 2.f * std::numbers::pi;
+			while (angle - previous < -std::numbers::pi)
+				angle += 2.f * std::numbers::pi;
 
 			rotation += angle;
 			previous = angle;
 		}
 		rotation /= points.size();
 
-		rotation = rotation * 180.f / std::numbers::pi;
-		if (rotation < 0.f)
+		rotation = (rotation * 180.f / std::numbers::pi) - initialRotation;
+
+		// remap range for discontinuity fix
+		while (rotation < 0.f)
 			rotation += 360.f;
-		else if (rotation >= 360.f)
-			rotation -= 360.f;
+
 		return rotation;
 	}
 
@@ -98,11 +105,7 @@ struct Shape
 		}
 	}
 
-	void setRotation(float degrees)
-	{
-		float offset = degrees - getRotation() + initialRotation;
-		rotate(offset);
-	}
+	void setRotation(float degrees) { rotate(degrees - getRotation()); }
 
 	void move(V2 &displacement)
 	{
