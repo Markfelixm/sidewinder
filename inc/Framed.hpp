@@ -13,12 +13,10 @@ struct Framed
 	Shape actual;
 	std::vector<FixedSpring> springs;
 
-	Framed(std::vector<PointMass> &points, float stiffness)
+	Framed(const std::vector<PointMass> &points, float stiffness) : actual(Shape(points)), frame(Shape(points))
 	{
-		frame = Shape(points);
-		frame.setFriction(0.f);
-		actual = Shape(points);
 		actual.setFriction(0.02f);
+		frame.setFriction(0.f);
 		for (size_t i = 0; i < points.size(); i++)
 			springs.push_back(FixedSpring(frame.points.at(i), actual.points.at(i), stiffness));
 	}
@@ -39,7 +37,7 @@ struct Framed
 		frame.rotate(rotationOffset);
 	}
 
-	void draw(Viewport &viewport, Color color)
+	void draw(Viewport &viewport, Color color) const
 	{
 		frame.draw(viewport, ColorAlpha(color, 0.2f));
 		actual.draw(viewport, color);

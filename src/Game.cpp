@@ -1,78 +1,72 @@
 #include "Game.hpp"
 #include "Collisions.hpp"
+#include "Planet.hpp"
 
-Game::Game()
-// :  viewState(SCENE), input(Input()), scene(Scene(input))
+void addOrbitKeyframes(Animated *animated, V2 center, float radius, float totalTime, size_t keyframeCount);
+
+Game::Game() : viewport(Viewport(1600, 1000, {800.f, 500.f})), input(Input())
 {
-	PointMass x = PointMass({200.f, 200.f}, 10.f);
-	PointMass y = PointMass({180.f, 220.f}, 10.f);
-	PointMass z = PointMass({220.f, 220.f}, 10.f);
-	std::vector<PointMass> xyz = {x, y, z};
-	attacker = std::make_unique<Framed>(xyz, 200.08f);
 
-	PointMass a = PointMass({500.f, 500.f}, 100.f);
-	PointMass b = PointMass({600.f, 550.f}, 100.f);
-	PointMass c = PointMass({700.f, 500.f}, 100.f);
-	PointMass d = PointMass({800.f, 700.f}, 100.f);
-	PointMass e = PointMass({400.f, 700.f}, 100.f);
-	std::vector<PointMass> points = {a, b, c, d, e};
-	defender = std::make_unique<Framed>(points, 2000.03f);
+	planet = std::make_unique<Planet>(V2(1400.f, 1400.f), 500.f, 3000.f, 50);
+	moon = std::make_unique<Planet>(V2(2200.f, 1400.f), 100.f, 600.f, 10);
+	shuttle = std::make_unique<Shuttle>(input, V2(800.f, 500.f), 0.f);
+	viewport.target = &shuttle->shuttle.frame;
 
-	once = std::make_unique<Animated>(attacker->frame);
-	once->createKeyframe(0.f, {200.f, 200.f}, 0.f);
-	once->createKeyframe(30.f, {1400.f, 800.f}, 0.f);
+	orbit = std::make_unique<Animated>(moon->planet.frame);
+	addOrbitKeyframes(orbit.get(), planet->planet.frame.getCenter(), 800.f, 30.f, 30);
+	orbit->action = Animated::action::LOOP;
+}
 
-	looping = std::make_unique<Animated>(defender->frame);
-	looping->createKeyframe(2.f, {200.f, 800.f}, 0.f);
-	looping->createKeyframe(10.f, {1400.f, 800.f}, 0.f);
-	looping->createKeyframe(20.f, {1400.f, 200.f}, 90.f);
-	looping->createKeyframe(30.f, {200.f, 200.f}, 90.f);
-	looping->action = Animated::action::LOOP;
+// TODO: move circular point creator to math utils, use for orbit and planet creation
+void addOrbitKeyframes(Animated *animated, V2 center, float radius, float totalTime, size_t keyframeCount)
+{
+	float time = 0.f;
+	float timestep = totalTime / keyframeCount;
+
+	for (size_t i = 0; i < keyframeCount; i++)
+	{
+		float angle = (2.f * std::numbers::pi * i) / keyframeCount;
+		V2 position = {center.x + radius * cosf(angle), center.y + radius * sinf(angle)};
+		time += timestep;
+		animated->createKeyframe(time, position, angle * std::numbers::pi / 180.f);
+	}
 }
 
 void Game::draw()
 {
 	BeginDrawing();
 	ClearBackground(LIGHTGRAY);
-	Vector2 raymouse = GetMousePosition();
-	V2 mouse = V2(raymouse.x, raymouse.y);
-	attacker->draw(RED);
-	Color color = BLUE;
-	if (collides(attacker->actual, defender->actual))
-		color = YELLOW;
-	defender->draw(color);
-	if (contains(defender->actual.points, mouse))
-	{
-		Edge nearest = findNearestEdge(defender->actual.points, mouse);
-		DrawLineEx({nearest.a.position.x, nearest.a.position.y}, {nearest.b.position.x, nearest.b.position.y}, 15.f, ORANGE);
-	}
-	DrawText(TextFormat("angle: %.2f", defender->frame.getRotation()), 20, 20, 14, BLACK);
-	DrawText(TextFormat("init: %.2f", defender->frame.initialRotation), 20, 40, 14, BLACK);
-	DrawText(TextFormat("once: %.2f", once->elapsed), 20, 80, 14, BLACK);
-	DrawText(TextFormat("once action: %i", once->action), 20, 100, 14, BLACK);
-	DrawText(TextFormat("looping: %.2f", looping->elapsed), 20, 120, 14, BLACK);
+
+	planet->draw(viewport, LIME);
+	moon->draw(viewport, BLUE);
+	shuttle->draw(viewport, RED);
+
+	DrawText(TextFormat("looping: %.2f", orbit->elapsed), 10, 10, 10, BLACK);
+
 	DrawFPS(GetScreenWidth() - 80, 10);
 	EndDrawing();
 }
 
 void Game::update(float deltaTime)
 {
-	attacker->update(deltaTime);
-	defender->update(deltaTime);
-	once->update(deltaTime);
-	looping->update(deltaTime);
+	input.update();
+
+	planet->update(deltaTime);
+	moon->update(deltaTime);
+	shuttle->shuttle.actual.acceleration += planet->gravitationalForce(shuttle->shuttle.actual.getCenter());
+	shuttle->update(deltaTime);
+	orbit->update(deltaTime);
 
 	// Vector2 raymouse = GetMousePosition();
 	// V2 mouse = V2(raymouse.x, raymouse.y);
 
-	if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
-	{
-		once->action = Animated::action::PLAY;
-	}
-	if (IsMouseButtonDown(MOUSE_RIGHT_BUTTON))
-	{
-		once->action = Animated::action::PAUSE;
-	}
+	// if (IsMouseButtonDown(MOUSE_LEFT_BUTTON))
+	// 	attacker->frame.setPosition(mouse);
 
-	handleCollision(attacker->actual, defender->actual);
+	handleCollision(shuttle->shuttle.actual, planet->planet.actual);
+	handleCollision(shuttle->shuttle.actual, moon->planet.actual);
+
+	// zoom out when shuttle velocity increases
+	// viewport.rotation = shuttle->shuttle.frame.getRotation() * -1.f;
+	viewport.update();
 }

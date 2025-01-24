@@ -1,12 +1,13 @@
 #pragma once
 
-// #include "Input.hpp"
-// #include "Scene.hpp"
+#include "Input.hpp"
 #include "raylib.h"
-#include "Framed.hpp"
-#include "Shape.hpp"
+#include "Viewport.hpp"
+#include "Planet.hpp"
+#include "Shuttle.hpp"
 #include "Animated.hpp"
 #include <memory>
+#include <vector>
 
 class Game
 {
@@ -25,14 +26,11 @@ public:
 	void update(float deltaTime);
 
 private:
-	// Input input;
-	// ViewState viewState;
-	// Title title;
-	// Scene scene;
-	// Retry retry;
+	Input input;
+	Viewport viewport;
 
-	std::unique_ptr<Framed> attacker;
-	std::unique_ptr<Framed> defender;
-	std::unique_ptr<Animated> once;
-	std::unique_ptr<Animated> looping;
+	std::unique_ptr<Planet> planet;
+	std::unique_ptr<Planet> moon;
+	std::unique_ptr<Animated> orbit;
+	std::unique_ptr<Shuttle> shuttle;
 };

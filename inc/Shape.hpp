@@ -16,7 +16,7 @@ struct Shape
 
 	Shape() : acceleration({0.f, 0.f}), initialRotation(0.f) {}
 
-	Shape(std::vector<PointMass> &points) : points(points), acceleration({0.f, 0.f}), initialRotation(0.f)
+	Shape(const std::vector<PointMass> &points) : points(points), acceleration({0.f, 0.f}), initialRotation(0.f)
 	{
 		initialRotation = getRotation();
 	}
@@ -44,7 +44,7 @@ struct Shape
 			point.friction = friction;
 	}
 
-	V2 getCenter()
+	V2 getCenter() const
 	{
 		V2 center = {0.f, 0.f};
 		for (auto &point : points)
@@ -53,7 +53,7 @@ struct Shape
 		return center;
 	}
 
-	float getRotation()
+	float getRotation() const
 	{
 		// TODO: find better way to avoid discontinuity jumps,
 		// get average angle of points, convert to degrees, zero initial rotation
@@ -124,7 +124,7 @@ struct Shape
 		}
 	}
 
-	void draw(Viewport &viewport, Color color)
+	void draw(Viewport &viewport, Color color) const
 	{
 		Vector2 *positions = new Vector2[points.size() + 1];
 		for (size_t i = 0; i < points.size(); i++)

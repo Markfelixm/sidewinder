@@ -44,6 +44,8 @@ inc/FixedSpring.hpp
 inc/Viewport.hpp
 inc/Shape.hpp
 inc/Framed.hpp
+inc/Planet.hpp
+inc/Shuttle.hpp
 inc/Collisions.hpp
 inc/Input.hpp
 inc/Animated.hpp
