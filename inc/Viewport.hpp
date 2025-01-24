@@ -7,16 +7,16 @@ struct Shape;
 
 struct Viewport
 {
-	int width;
-	int height;
-	AABB bounds;
-	V2 position;
+	float screenWidth;
+	float screenHeight;
+	AABB worldBounds;
+	V2 centerInWorld;
+	Shape *target;
 	float zoom;
 	float rotation;
-	Shape *target;
 
-	Viewport(int width, int height, V2 position, float zoom, float rotation, Shape *target = nullptr);
+	Viewport(int screenWidth, int screenHeight, V2 centerInWorld);
 	void update();
-	V2 worldToScreen(const V2 &worldPos) const;
-	V2 screenToWorld(const V2 &screenPos) const;
+	V2 worldToScreen(const V2 &worldPosition) const;
+	V2 screenToWorld(const V2 &screenPosition) const;
 };

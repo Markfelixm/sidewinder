@@ -2,38 +2,42 @@
 #include "Shape.hpp"
 #include "Matrix.hpp"
 
-Viewport::Viewport(int width, int height, V2 position, float zoom, float rotation, Shape *target)
-	: width(width), height(height), bounds(AABB(0.f, 0.f, 0.f, 0.f)),
-	  position(position), zoom(zoom), rotation(rotation), target(target)
+Viewport::Viewport(int screenWidth, int screenHeight, V2 centerInWorld)
+	: screenWidth(screenWidth), screenHeight(screenHeight),
+	  worldBounds(AABB(0.f, 0.f, 0.f, 0.f)),
+	  centerInWorld(centerInWorld), target(nullptr),
+	  zoom(1.f), rotation(0.f)
 {
 	update();
 }
 
 void Viewport::update()
 {
-	V2 offset = V2(width, height) * (0.5f / zoom);
 	// TODO: attach fixedSpring
 	if (target)
-		position = target->getCenter();
-	position = worldToScreen(position);
-	offset = worldToScreen(offset);
-	bounds = AABB(
-		position.x - offset.x,
-		position.x + offset.x,
-		position.y - offset.y,
-		position.y + offset.y);
+		centerInWorld = target->getCenter();
+
+	// TODO: add splitscreen, where these coords can be screenbox aabb instead of 0,0 to width,height
+	std::vector<V2> worldPoints;
+	worldPoints.reserve(4);
+	worldPoints.push_back(screenToWorld({0.f, 0.f}));
+	worldPoints.push_back(screenToWorld({screenWidth, 0.f}));
+	worldPoints.push_back(screenToWorld({screenWidth, screenHeight}));
+	worldPoints.push_back(screenToWorld({0.f, screenHeight}));
+
+	worldBounds.resize(worldPoints);
 }
 
-V2 Viewport::worldToScreen(const V2 &worldPos) const
+V2 Viewport::worldToScreen(const V2 &worldPosition) const
 {
 	M22 transform(rotation, zoom);
-	V2 offset = transform.transform(worldPos - position);
-	return offset + V2(width * 0.5f, height * 0.5f);
+	V2 offset = transform.transform(worldPosition - centerInWorld);
+	return offset + V2(screenWidth * 0.5f, screenHeight * 0.5f);
 }
 
-V2 Viewport::screenToWorld(const V2 &screenPos) const
+V2 Viewport::screenToWorld(const V2 &screenPosition) const
 {
 	M22 transform(rotation, zoom);
-	V2 offset = screenPos - V2(width * 0.5f, height * 0.5f);
-	return position + transform.inverse().transform(offset);
+	V2 offset = screenPosition - V2(screenWidth * 0.5f, screenHeight * 0.5f);
+	return centerInWorld + transform.inverse().transform(offset);
 }

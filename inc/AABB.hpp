@@ -35,6 +35,26 @@ struct AABB
 		}
 	}
 
+	void resize(std::vector<V2> &vertices)
+	{
+		left = std::numeric_limits<float>::max();
+		right = std::numeric_limits<float>::lowest();
+		top = std::numeric_limits<float>::max();
+		bottom = std::numeric_limits<float>::lowest();
+
+		for (const auto &vertex : vertices)
+		{
+			if (vertex.x < left)
+				left = vertex.x;
+			if (vertex.x > right)
+				right = vertex.x;
+			if (vertex.y < top)
+				top = vertex.y;
+			if (vertex.y > bottom)
+				bottom = vertex.y;
+		}
+	}
+
 	bool contains(V2 &position)
 	{
 		return (position.x >= left && position.x <= right &&
